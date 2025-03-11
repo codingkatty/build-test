@@ -4,18 +4,39 @@ function setup() {
     background(255, 255, 255);
 }
 
-draw = function() {
-    fill(21, 62, 100); // start color
+function draw() {
+    background(255); // Clears previous frames to prevent overdraw
 
-    if (mouseIsPressed && mouseX > 330 && mouseX < 580 && mouseY > 400 && mouseY < 500) { 
-        fill(25, 99, 168); // click color
+    // Default color
+    let buttonColor1 = color(21, 62, 100);
+    let buttonColor2 = color(21, 62, 100);
+
+    // Change color if either button is clicked
+    if (mouseIsPressed) {
+        if (mouseX > 330 && mouseX < 580 && mouseY > 400 && mouseY < 500) { 
+            buttonColor1 = color(25, 99, 168);
+        }
+        if (mouseX > 630 && mouseX < 880 && mouseY > 400 && mouseY < 500) { 
+            buttonColor2 = color(25, 99, 168);
+        }
     }
-    noStroke();
-    rect(330, 400, 250, 100, 40);  // the button
 
-    // The button text
-    fill(255, 255, 255);
+    noStroke();
+
+    // Draw first button
+    fill(buttonColor1);
+    rect(330, 400, 250, 100, 40); // Button 1 at x=330
+
+    // Draw second button
+    fill(buttonColor2);
+    rect(630, 400, 250, 100, 40); // Button 2 at x=630 (gives spacing)
+
+    // Button texts
+    fill(255);
     textSize(30);
-    textAlign(CENTER, CENTER); // Center the text
-    text("Start", 330 + 250 / 2, 400 + 100 / 2); // Centering the text inside the button
-};
+    textAlign(CENTER, CENTER);
+    
+    text("Start", 330 + 125, 450); // Start button text centered
+    text("Rules", 630 + 125, 450); // Rules button text centered
+}
+
