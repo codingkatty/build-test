@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cat Escape - A Feline Adventure</title>
+    <link rel="icon" type="image/png" href="paw.png" />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Itim&family=Nunito:wght@400;700&display=swap");
+
+      body {
+        font-family: "Nunito", sans-serif;
+        background-color: #ffefd5;
+        margin: 0;
+        padding: 0;
+        color: #333;
+      }
+
+      header {
+        background-color: #ff9e80;
+        padding: 20px;
+        text-align: center;
+        border-bottom: 5px dotted #ffccbc;
+      }
+
+      h1 {
+        font-family: "Bubblegum Sans", cursive;
+        color: #5d4037;
+        margin: 0;
+        font-size: 48px;
+        text-shadow: 2px 2px 0px #ffccbc;
+      }
+
+      h2 {
+        font-family: "Itim", cursive;
+        color: #5d4037;
+      }
+
+      .tagline {
+        font-style: italic;
+        color: #6d4c41;
+        margin-top: 10px;
+        font-size: 18px;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .game-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 30px 0;
+      }
+
+      canvas {
+        background-color: #fff;
+        border: 10px solid #ffccbc;
+        border-radius: 10px;
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .instructions {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        margin: 20px 0;
+        border-left: 5px solid #ff9e80;
+      }
+
+      .paw-print {
+        display: inline-block;
+        color: #ff9e80;
+        margin-right: 5px;
+      }
+
+      footer {
+        background-color: #ff9e80;
+        padding: 15px;
+        text-align: center;
+        color: #5d4037;
+        border-top: 5px dotted #ffccbc;
+        margin-top: 30px;
+        font-family: "Itim", cursive;
+      }
+
+      .about-section {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin: 30px 0;
+      }
+
+      .about-text {
+        flex: 1;
+        min-width: 300px;
+        padding-right: 20px;
+      }
+
+      .cat-image {
+        flex: 1;
+        min-width: 300px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .start-btn {
+        font-family: "Bubblegum Sans", cursive;
+        background-color: #ff9e80;
+        border: none;
+        color: white;
+        padding: 15px 30px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 22px;
+        margin: 20px 0;
+        cursor: pointer;
+        border-radius: 50px;
+        font-weight: bold;
+        box-shadow: 0 5px 0 #e57373;
+        transition: all 0.2s;
+      }
+
+      .start-btn:hover {
+        background-color: #ffab91;
+        transform: translateY(-2px);
+      }
+
+      .start-btn:active {
+        transform: translateY(3px);
+        box-shadow: 0 2px 0 #e57373;
+      }
+
+      .score {
+        font-family: "Itim", cursive;
+        font-size: 24px;
+        margin-top: 10px;
+        color: #5d4037;
+        font-weight: bold;
+      }
+
+      @media (max-width: 768px) {
+        .about-section {
+          flex-direction: column;
+        }
+
+        canvas {
+          width: 100%;
+          max-width: 400px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Cat Escape</h1>
+      <p class="tagline">"Escape the cat. Work together!"</p>
+    </header>
+
+    <div class="container">
+      <div class="about-section">
+        <div class="about-text">
+          <h2><span class="paw-print">🐾</span> Welcome to Cat Escape!</h2>
+          <p>
+            Trapped in a world ruled by a giant cat, two players must work
+            together to escape! Solve puzzles, activate levers, and navigate
+            tricky environments using your unique abilities. One player squeezes
+            through tight spaces, while the other traverses water, flies, or
+            burrows to uncover new paths.
+          </p>
+          <p>
+            With pixel-art visuals and soothing lofi music, Cat Run offers a
+            cooperative puzzle escape experience like no other. Can you and your
+            partner outsmart the cat and make your great escape? Work together,
+            solve puzzles, and run for your lives!
+          </p>
+        </div>
+        <div class="cat-image">
+          <img src="/api/placeholder/300/300" alt="Cute cartoon cat" />
+        </div>
+      </div>
+
+      <div class="instructions">
+        <h2><span class="paw-print">🐾</span> How to Play</h2>
+        <ul>
+          <li>
+            Move using <strong>WASD</strong> or <strong>arrow keys</strong>.
+          </li>
+          <li>Use <strong>abilities</strong> with E or Spacebar</li>
+          <li>
+            Solve puzzles by activating levers, pressure plates, and buttons
+          </li>
+          <li>
+            Cooperate—one player squeezes through tight spaces, the other
+            navigates water, flies, or burrows
+          </li>
+          <li>Escape the giant cat and reach the exit together!</li>
+        </ul>
+      </div>
+
+      <div class="game-section">
+        <h2><span class="paw-print">🐾</span> Play Now!</h2>
+        <button class="start-btn" id="startGame">Start Game</button>
+        <canvas
+          id="gameCanvas"
+          width="800"
+          height="400"
+          style="display: none"
+        ></canvas>
+        <p class="score" id="scoreDisplay" style="display: none">Score: 0</p>
+      </div>
+    </div>
+
+    <footer>
+      <p>© 2025 Cat Escape</p>
+      <p>Created with ❤️ for puzzle game lovers</p>
+    </footer>
+  </body>
+</html>
