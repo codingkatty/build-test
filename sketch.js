@@ -6,12 +6,12 @@ let overButton = false;
 function setup() {
     var myCanvas = createCanvas(1200, 675);
     myCanvas.parent('game-container');
-    background(255, 255, 255);
+    background(255);
     textAlign(CENTER, CENTER);
 }
 
 function draw() {
-    background(255); // Clears previous frames
+    background(230, 238, 255); // Clears previous frames
     
     if (gameState === 'menu') {
         drawMenu();
