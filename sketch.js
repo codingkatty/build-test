@@ -4,10 +4,18 @@ let gameState = 'menu';
 let overButton = false;
 let showModal = false; // Track if modal should be displayed
 
+let pixel1, pixel2;
+function preload() {
+    pixel1 = loadFont('fonts/alagard.ttf');
+    pixel2 = loadFont('fonts/minecraft_font.ttf');
+}
+
 function setup() {
     var myCanvas = createCanvas(1200, 675);
     myCanvas.parent('game-container');
     textAlign(CENTER, CENTER);
+    textFont(pixel2);
+    textSize(30);
 }
 
 function draw() {
@@ -27,6 +35,7 @@ function draw() {
 function drawMenu() {
     // Title
     fill(0);
+    textFont(pixel1);
     textSize(80);
     textStyle(BOLD);
     text("Cat Escape", width/2, 300);
@@ -64,7 +73,8 @@ function drawMenu() {
 
     // Button text
     fill(255);
-    textSize(30);
+    textSize(26);
+    textFont(pixel2);
     text("Start", 330 + 125, 450);
     text("Game Rules", 630 + 125, 450);
 }
@@ -89,7 +99,7 @@ function drawModal() {
     ellipse(770, 220, 30, 30);
     fill(255);
     textSize(20);
-    text("X", 770, 220);
+    text("X", 771, 218);
 }
 
 // Check for close button click
