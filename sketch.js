@@ -4,7 +4,7 @@ function setup() {
     background(255, 255, 255);
 }
 
-draw = function() {
+function draw() {
     fill(21, 62, 100); // start color
 
     if (mouseIsPressed && mouseX > 330 && mouseX < 580 && mouseY > 400 && mouseY < 500) { 
