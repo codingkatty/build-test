@@ -8,6 +8,16 @@ let pixel1, pixel2;
 function preload() {
     pixel1 = loadFont('fonts/alagard.ttf');
     pixel2 = loadFont('fonts/minecraft_font.ttf');
+
+    cat_frame1 = loadImage('assets/cat_walk_test1.png');
+    cat_frame2 = loadImage('assets/cat_walk_test2.png');
+
+    cat_base = loadImage('assets/cat_base_test.png');
+
+    cat_eyes1 = loadImage('assets/cat_eyes_test1.png');
+    cat_eyes2 = loadImage('assets/cat_eyes_test2.png');
+    cat_eyes3 = loadImage('assets/cat_eyes_test3.png');
+    cat_eyes4 = loadImage('assets/cat_eyes_test4.png');
 }
 
 function setup() {
@@ -18,11 +28,18 @@ function setup() {
     textSize(30);
 }
 
+let animationStarted = false;
+let animationProgress = 0;
+let frameCounter = 0;
+
 function draw() {
     background(230, 238, 255); // Clears previous frames
-    
+
     if (gameState === 'menu') {
         drawMenu();
+    } else if (gameState === 'story') {
+        drawStory();
+    } else if (gameState === 'game') {
     }
 
     if (showModal) {
@@ -38,7 +55,7 @@ function drawMenu() {
     textFont(pixel1);
     textSize(80);
     textStyle(BOLD);
-    text("Cat Escape", width/2, 300);
+    text("Cat Escape", width / 2, 300);
     textStyle(NORMAL);
 
     let startColor = color(21, 62, 100);
@@ -51,6 +68,8 @@ function drawMenu() {
         overButton = true;
         if (mouseIsPressed) {
             console.log("Start button clicked");
+            animationStarted = true;
+            gameState = 'story'; // Change game state to story
         }
     }
 
@@ -100,6 +119,51 @@ function drawModal() {
     fill(255);
     textSize(20);
     text("X", 771, 218);
+}
+
+// story animation
+function drawStory() {
+    background(100, 0, 0);
+    if (animationProgress < 100) {
+        frameCounter = (frameCount / 10) % 2;
+
+        if (frameCounter < 1) {
+            image(cat_frame1, 300, 0);
+        } else {
+            image(cat_frame2, 300, 0);
+        }
+        animationProgress++;
+    } else if (animationProgress < 150) {
+        image(cat_base, 300, 50);
+        animationProgress++;
+    } else if (animationProgress < 240) {
+        frameCounter = Math.min((animationProgress - 150) / 2, 3);
+
+        background(220, 30, 30);
+        image(cat_base, 300, 50);
+
+        if (frameCounter < 1) {
+            image(cat_eyes1, 330, 250);
+        } else if (frameCounter < 2) {
+            image(cat_eyes2, 330, 250);
+        } else if (frameCounter < 3) {
+            image(cat_eyes3, 330, 250);
+        } else {
+            image(cat_eyes4, 330, 250);
+        }
+        animationProgress++;
+    } else if (animationProgress < 500) {
+        background(255);
+        fill(0);
+        textSize(40);
+        text("[cat chasing down mouse and bird]", 600, 100);
+
+        animationProgress++;
+    }else {
+        gameState = 'game';
+        animationStarted = false;
+        animationProgress = 0;
+    }
 }
 
 // Check for close button click
