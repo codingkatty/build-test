@@ -18,6 +18,10 @@ function preload() {
     cat_eyes2 = loadImage('assets/cat_eyes_test2.png');
     cat_eyes3 = loadImage('assets/cat_eyes_test3.png');
     cat_eyes4 = loadImage('assets/cat_eyes_test4.png');
+    
+    mouse = loadImage('assets/mouse.png');    
+    bird = loadImage('assets/bird.png');
+    arrow = loadImage('assets/arrow.png')
 }
 
 function setup() {
@@ -39,7 +43,8 @@ function draw() {
         drawMenu();
     } else if (gameState === 'story') {
         drawStory();
-    } else if (gameState === 'game') {
+    } else if (gameState === 'costume') {
+        drawCostume();
     }
 
     if (showModal) {
@@ -164,6 +169,12 @@ function drawStory() {
         animationStarted = false;
         animationProgress = 0;
     }
+}
+
+function drawCostume() {
+    image(mouse, 320, 0)
+    image(bird, 320, 0)
+    image(arrow, 320, 0)
 }
 
 // Check for close button click
