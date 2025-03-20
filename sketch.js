@@ -54,11 +54,20 @@ function draw() {
         // Draw level 1
         fill(0);
         text("Level 1", width / 2, height / 2);
+    } else if (gameState === 'level2') {
+        // Draw level 2
+        fill(0);
+        text("Level 2", width / 2, height / 2);
+    } else if (gameState === 'level3') {
+        // Draw level 3
+        fill(0);
+        text("Level 3", width / 2, height / 2);
     }
-
     if (showModal) {
         drawModal();
     }
+    
+
 
     updateCursor();
     overButton = false;
