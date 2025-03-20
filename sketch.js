@@ -9,6 +9,11 @@ let selectedCharacter2 = 'mouse';
 let player1Confirmed = false;
 let player2Confirmed = false;
 
+let anim_catX = 80;
+let anim_mouseX = 300;
+let anim_birdX = 280;
+let anim_black_h = 100;
+
 let pixel1, pixel2;
 function preload() {
     pixel1 = loadFont('fonts/alagard.ttf');
@@ -23,6 +28,14 @@ function preload() {
     cat_eyes2 = loadImage('assets/cat_eyes_test2.png');
     cat_eyes3 = loadImage('assets/cat_eyes_test3.png');
     cat_eyes4 = loadImage('assets/cat_eyes_test4.png');
+
+    mouse_run1 = loadImage('assets/mouse_run_anim_test1.png');
+    mouse_run2 = loadImage('assets/mouse_run_anim_test2.png');
+
+    bird_fly1 = loadImage('assets/bird_run_anim_test1.png');
+    bird_fly2 = loadImage('assets/bird_run_anim_test2.png');
+
+    cat_chaser = loadImage('assets/vio_cat_test.png');
 
     mouse = loadImage('assets/mouse-test.png');
     bird = loadImage('assets/bird-test.png');
@@ -172,11 +185,36 @@ function drawStory() {
             image(cat_eyes4, 330, 250);
         }
         animationProgress++;
-    } else if (animationProgress < 500) {
+    } else if (animationProgress < 550) {
+        frameCounter = (frameCount / 10) % 2;
+
         background(255);
+
+        image(cat_chaser, anim_catX, 300, 220, 220);
+        
+        if (frameCounter < 1) {
+            image(mouse_run1, anim_mouseX, 400, 96, 72);
+            image(bird_fly1, anim_birdX, 200, 120, 120);
+        } else {
+            image(mouse_run2, anim_mouseX, 400, 96, 72);
+            image(bird_fly2, anim_birdX, 200, 120, 120);
+        }
+
         fill(0);
-        textSize(40);
-        text("[cat chasing down mouse and bird]", 600, 100);
+        rect(0, 0, 1200, anim_black_h);
+        rect(0, 675 - anim_black_h, 1200, anim_black_h);
+
+        anim_catX += 4;
+        anim_mouseX += 5;
+        anim_birdX += 4;
+
+        if (anim_black_h < 140) {
+            anim_black_h += 1;
+        }
+
+        if (animationProgress > 480) {
+            anim_black_h -= (animationProgress - 480) / 10;
+        }
 
         animationProgress++;
     } else {
