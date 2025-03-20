@@ -61,7 +61,12 @@ function draw() {
     }
 
     updateCursor();
-    //text("mouseX: " + mouseX + " mouseY: " + mouseY, 100, 100);
+    overButton = false;
+
+    // debug
+    //textSize(20);
+    //fill(0);
+    //text("mouseX: " + Math.floor(mouseX) + " mouseY: " + Math.floor(mouseY), 200, 100);
 }
 
 function drawMenu() {
@@ -195,6 +200,9 @@ function drawCostume() {
     text("Player 1", 300, 200);
 
     // Left arrow button
+    if (mouseX > 150 && mouseX < 180 && mouseY > 270 && mouseY < 330) {
+        overButton = true;
+    }
     triangle(150, 300, 180, 270, 180, 330);
 
     // Display current character
@@ -205,12 +213,18 @@ function drawCostume() {
     }
 
     // Right arrow button
+    if (mouseX > 410 && mouseX < 440 && mouseY > 270 && mouseY < 330) {
+        overButton = true;
+    }
     triangle(440, 300, 410, 270, 410, 330);
 
     // Player 2 selection
     text("Player 2", 900, 200);
 
     // Left arrow button
+    if (mouseX > 760 && mouseX < 790 && mouseY > 270 && mouseY < 330) {
+        overButton = true;
+    }
     triangle(760, 300, 790, 270, 790, 330);
 
     // Display current character
@@ -221,11 +235,18 @@ function drawCostume() {
     }
 
     // Right arrow button
+    if (mouseX > 1030 && mouseX < 1060 && mouseY > 270 && mouseY < 330) {
+        overButton = true;
+    }
     triangle(1060, 300, 1030, 270, 1030, 330);
 
     // Confirm buttons
     if (!player1Confirmed) {
         fill(0, 255, 0);
+        if (mouseX > 225 && mouseX < 375 && mouseY > 450 && mouseY < 500) {
+            overButton = true;
+            fill(0, 200, 0);
+        }
         rect(225, 450, 150, 50);
         fill(255);
         text("Confirm", 302, 475);
@@ -233,6 +254,10 @@ function drawCostume() {
 
     if (!player2Confirmed) {
         fill(0, 255, 0);
+        if (mouseX > 830 && mouseX < 980 && mouseY > 450 && mouseY < 500) {
+            overButton = true;
+            fill(0, 200, 0);
+        }
         rect(830, 450, 150, 50);
         fill(255);
         text("Confirm", 907, 475);
@@ -250,15 +275,25 @@ function mousePressed() {
         showModal = false;
     }
 
-    // Player 1 controls
+    const characters = ['mouse', 'bird'];
     if (!player1Confirmed) {
         // Left arrow
         if (mouseX > 150 && mouseX < 180 && mouseY > 270 && mouseY < 330) {
-            selectedCharacter1 = 'mouse';
+            let currentIndex = characters.indexOf(selectedCharacter1);
+            if (currentIndex === 0) {
+                selectedCharacter1 = characters[characters.length - 1];
+            } else {
+                selectedCharacter1 = characters[currentIndex - 1];
+            }
         }
         // Right arrow
         if (mouseX > 410 && mouseX < 440 && mouseY > 270 && mouseY < 330) {
-            selectedCharacter1 = 'bird';
+            let currentIndex = characters.indexOf(selectedCharacter1);
+            if (currentIndex === characters.length - 1) {
+                selectedCharacter1 = characters[0];
+            } else {
+                selectedCharacter1 = characters[currentIndex + 1];
+            }
         }
         // Confirm button
         if (mouseX > 225 && mouseX < 375 && mouseY > 450 && mouseY < 500) {
@@ -272,11 +307,21 @@ function mousePressed() {
     if (!player2Confirmed) {
         // Left arrow
         if (mouseX > 760 && mouseX < 790 && mouseY > 270 && mouseY < 330) {
-            selectedCharacter2 = 'mouse';
+            let currentIndex = characters.indexOf(selectedCharacter2);
+            if (currentIndex === 0) {
+                selectedCharacter2 = characters[characters.length - 1];
+            } else {
+                selectedCharacter2 = characters[currentIndex - 1];
+            }
         }
         // Right arrow
         if (mouseX > 1030 && mouseX < 1060 && mouseY > 270 && mouseY < 330) {
-            selectedCharacter2 = 'bird';
+            let currentIndex = characters.indexOf(selectedCharacter2);
+            if (currentIndex === characters.length - 1) {
+                selectedCharacter2 = characters[0];
+            } else {
+                selectedCharacter2 = characters[currentIndex + 1];
+            }
         }
         // Confirm button
         if (mouseX > 830 && mouseX < 980 && mouseY > 450 && mouseY < 500) {
@@ -285,6 +330,7 @@ function mousePressed() {
             }
         }
     }
+
 }
 
 function updateCursor() {
