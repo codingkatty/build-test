@@ -216,47 +216,18 @@ function drawStory() {
         if (anim_black_h < 140) {
             anim_black_h += 1;
         }
-
+        
         if (animationProgress > 480) {
             anim_black_h -= (animationProgress - 480) / 10;
+            animationProgress++;
         }
-
         animationProgress++;
     } else {
-        image(cat_frame2, 300, 0);
+        gameState = "costume";
+        animationStarted = false;
+        animationProgress = 0;
     }
-    animationProgress++;
-} else if (animationProgress < 150) {
-    image(cat_base, 300, 50);
-    animationProgress++;
-} else if (animationProgress < 240) {
-    frameCounter = Math.min((animationProgress - 150) / 2, 3);
-
-    background(220, 30, 30);
-    image(cat_base, 300, 50);
-
-    if (frameCounter < 1) {
-        image(cat_eyes1, 330, 250);
-    } else if (frameCounter < 2) {
-        image(cat_eyes2, 330, 250);
-    } else if (frameCounter < 3) {
-        image(cat_eyes3, 330, 250);
-    } else {
-        image(cat_eyes4, 330, 250);
-    }
-    animationProgress++;
-} else if (animationProgress < 500) {
-    background(255);
-    fill(0);
-    textSize(40);
-    text("[cat chasing down mouse and bird]", 600, 100);
-
-    animationProgress++;
-} else {
-    gameState = "costume";
-    animationStarted = false;
-    animationProgress = 0;
-}
+};
 
 function drawCostume() {
     // Title
