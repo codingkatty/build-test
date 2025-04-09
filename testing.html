@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cat Escape</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-family: "Arial", sans-serif;
+        background-color: #0f0f1f;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      #game-container {
+        position: relative;
+        width: 800px;
+        height: 600px;
+        background-color: #1a1a2e;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+      }
+
+      #start-screen,
+      #level-intro,
+      #game-screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.5s;
+      }
+
+      #level-intro,
+      #game-screen {
+        display: none;
+      }
+
+      h1 {
+        font-size: 60px;
+        margin-bottom: 40px;
+        color: #ffcc00;
+        text-shadow: 3px 3px 0 #ff6600;
+        animation: glow 2s infinite alternate;
+      }
+
+      @keyframes glow {
+        from {
+          text-shadow: 0 0 10px #ff9900, 0 0 20px #ff9900;
+        }
+        to {
+          text-shadow: 0 0 20px #ff6600, 0 0 30px #ff6600;
+        }
+      }
+
+      .level-text {
+        font-size: 48px;
+        color: #ffcc00;
+      }
+
+      button {
+        background-color: #ff6600;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 15px 30px;
+        font-size: 20px;
+        margin: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 5px #cc5200;
+      }
+
+      button:hover {
+        background-color: #ff8533;
+        transform: translateY(-2px);
+      }
+
+      button:active {
+        background-color: #e65c00;
+        box-shadow: 0 2px #cc5200;
+        transform: translateY(3px);
+      }
+
+      #game-area {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        background-color: #121224;
+      }
+
+      .table {
+        position: absolute;
+        background-color: #8b4513;
+        border: 3px solid #5c2d0e;
+        border-radius: 5px;
+      }
+
+      #player {
+        width: 40px;
+        height: 40px;
+        position: absolute;
+        background-color: #ffaa00;
+        border-radius: 50%;
+        z-index: 10;
+        transition: transform 0.1s;
+        background-image: radial-gradient(circle, #ffcc00 30%, #ff8c00 70%);
+        box-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+      }
+
+      /* Cat face details */
+      #player::before,
+      #player::after {
+        content: "";
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background-color: #000;
+        border-radius: 50%;
+        top: 12px;
+      }
+
+      #player::before {
+        left: 9px;
+      }
+
+      #player::after {
+        right: 9px;
+      }
+
+      #rules-content {
+        padding: 20px;
+        max-width: 80%;
+        text-align: center;
+        line-height: 1.6;
+      }
+
+      .key {
+        display: inline-block;
+        padding: 5px 10px;
+        background-color: #333;
+        border-radius: 4px;
+        margin: 0 2px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-container">
+      <!-- Start Screen -->
+      <div id="start-screen">
+        <h1>Cat Escape</h1>
+        <button id="start-button">Start</button>
+        <button id="rules-button">Rules</button>
+      </div>
+
+      <!-- Level Intro -->
+      <div id="level-intro">
+        <h2 class="level-text">Level 1</h2>
+      </div>
+
+      <!-- Game Screen -->
+      <div id="game-screen">
+        <div id="game-area">
+          <div id="player"></div>
+          <!-- Tables will be added via JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Game elements
+      const startScreen = document.getElementById("start-screen");
+      const levelIntro = document.getElementById("level-intro");
+      const gameScreen = document.getElementById("game-screen");
+      const startButton = document.getElementById("start-button");
+      const rulesButton = document.getElementById("rules-button");
+      const player = document.getElementById("player");
+      const gameArea = document.getElementById("game-area");
+
+      // Game state
+      let playerX = 400;
+      let playerY = 500;
+      let playerSpeed = 5;
+      let playerVelocityY = 0;
+      let keys = {};
+      let gameActive = false;
+      let isJumping = false;
+      let canJump = false;
+      let jumpCooldown = 0;
+
+      // Table positions for Level 1
+      const level1Tables = [
+        { x: 100, y: 500, width: 200, height: 30 },
+        { x: 500, y: 500, width: 200, height: 30 },
+        { x: 300, y: 400, width: 200, height: 30 },
+        { x: 150, y: 300, width: 200, height: 30 },
+        { x: 450, y: 300, width: 200, height: 30 },
+      ];
+
+      // Event Listeners
+      startButton.addEventListener("click", startGame);
+      rulesButton.addEventListener("click", showRules);
+
+      window.addEventListener("keydown", (e) => {
+        keys[e.key.toLowerCase()] = true;
+      });
+
+      window.addEventListener("keyup", (e) => {
+        keys[e.key.toLowerCase()] = false;
+      });
+
+      // Initialize player position
+      updatePlayerPosition();
+
+      // Game Functions
+      function startGame() {
+        startScreen.style.display = "none";
+        levelIntro.style.display = "flex";
+
+        // Show Level 1 intro for 5 seconds
+        setTimeout(() => {
+          levelIntro.style.display = "none";
+          gameScreen.style.display = "block";
+          gameActive = true;
+          createLevel1();
+          gameLoop();
+        }, 5000);
+      }
+
+      function showRules() {
+        // First, check if rules are already being shown
+        let existingRules = document.getElementById("rules-content");
+
+        if (existingRules) {
+          // If rules are already showing, remove them and return to start screen
+          existingRules.remove();
+          return;
+        }
+
+        // Create rules content
+        const rulesContent = document.createElement("div");
+        rulesContent.id = "rules-content";
+        rulesContent.innerHTML = `
+                <h2>How to Play</h2>
+                <p>You are a cat trying to escape! Use the tables to navigate.</p>
+                <p>
+                    <span class="key">W</span> - Jump/Move Up<br>
+                    <span class="key">A</span> - Move Left<br>
+                    <span class="key">S</span> - Move Down<br>
+                    <span class="key">D</span> - Move Right
+                </p>
+                <button id="back-button">Back</button>
+            `;
+
+        startScreen.appendChild(rulesContent);
+
+        // Add event listener to back button
+        document.getElementById("back-button").addEventListener("click", () => {
+          rulesContent.remove();
+        });
+      }
+
+      function createLevel1() {
+        // Create tables
+        level1Tables.forEach((table, index) => {
+          const tableElement = document.createElement("div");
+          tableElement.className = "table";
+          tableElement.style.left = table.x + "px";
+          tableElement.style.top = table.y + "px";
+          tableElement.style.width = table.width + "px";
+          tableElement.style.height = table.height + "px";
+          gameArea.appendChild(tableElement);
+        });
+
+        // Set initial player position
+        playerX = 400;
+        playerY = 550; // Start player closer to the ground
+        updatePlayerPosition();
+      }
+
+      function updatePlayerPosition() {
+        player.style.left = playerX - 20 + "px"; // 20 is half the player width
+        player.style.top = playerY - 20 + "px"; // 20 is half the player height
+      }
+
+      function isPlayerOnTable() {
+        const playerBottom = playerY + 20; // Bottom of player (center + radius)
+        const feetRange = 5; // How far can the feet be from the table top
+
+        for (const table of level1Tables) {
+          // Check if player's feet are at or very slightly above table top
+          // AND player is horizontally within table bounds
+          if (
+            Math.abs(playerBottom - table.y) <= feetRange &&
+            playerX >= table.x - 20 &&
+            playerX <= table.x + table.width + 20
+          ) {
+            return table;
+          }
+        }
+
+        // Check if player is on the ground
+        if (Math.abs(playerBottom - 600) <= feetRange) {
+          return { y: 600, isGround: true };
+        }
+
+        return null;
+      }
+
+      function checkCollisions() {
+        const playerRadius = 20;
+
+        // First check if we're on a table
+        let currentTable = isPlayerOnTable();
+
+        if (currentTable) {
+          // If we're on a table or ground, snap to the top and stop falling
+          playerY = currentTable.y - playerRadius;
+          playerVelocityY = 0;
+          isJumping = false;
+          canJump = true;
+          return true;
+        }
+
+        // If not already on a table, check for table collision when falling
+        if (playerVelocityY > 0) {
+          // Only check when moving downward
+          for (const table of level1Tables) {
+            // Check for landing on top of table
+            if (
+              playerY + playerRadius <= table.y &&
+              playerY + playerRadius + playerVelocityY >= table.y &&
+              playerX >= table.x - playerRadius &&
+              playerX <= table.x + table.width + playerRadius
+            ) {
+              playerY = table.y - playerRadius;
+              playerVelocityY = 0;
+              isJumping = false;
+              canJump = true;
+              return true;
+            }
+          }
+        }
+
+        // Check if player is on the floor
+        if (playerY + playerRadius >= 600) {
+          playerY = 600 - playerRadius;
+          playerVelocityY = 0;
+          isJumping = false;
+          canJump = true;
+          return true;
+        }
+
+        return false;
+      }
+
+      function handleJumping() {
+        // Check if we can jump and if the player is pressing W
+        if (canJump && keys["w"]) {
+          playerVelocityY = -15; // Jump velocity
+          isJumping = true;
+          canJump = false;
+          return true;
+        }
+        return false;
+      }
+
+      function gameLoop() {
+        if (!gameActive) return;
+
+        // Handle horizontal movement
+        if (keys["a"] && playerX > 20) {
+          playerX -= playerSpeed;
+        }
+        if (keys["d"] && playerX < 780) {
+          playerX += playerSpeed;
+        }
+
+        // Handle vertical movement - either jump or apply gravity
+        if (!handleJumping()) {
+          // Apply gravity if not jumping
+          playerVelocityY += 0.8;
+        }
+
+        // Apply vertical velocity
+        playerY += playerVelocityY;
+
+        // Check for collisions with tables
+        checkCollisions();
+
+        // Keep player within bounds
+        if (playerX < 20) playerX = 20;
+        if (playerX > 780) playerX = 780;
+        if (playerY < 20) playerY = 20;
+
+        // Update player visual rotation based on movement
+        if (keys["a"]) {
+          player.style.transform = "rotate(-5deg)";
+        } else if (keys["d"]) {
+          player.style.transform = "rotate(5deg)";
+        } else {
+          player.style.transform = "rotate(0deg)";
+        }
+
+        updatePlayerPosition();
+        requestAnimationFrame(gameLoop);
+      }
+    </script>
+  </body>
+</html>
