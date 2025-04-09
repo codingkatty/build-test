@@ -103,6 +103,22 @@
         { left: "a", right: "d", up: "w", fly: "e" },
         true
       );
+
+      // Override the move method for player1 to allow jumping with 'w'
+      player1.move = function (keys) {
+        if (keys[this.controls.left]) this.x -= 5;
+        if (keys[this.controls.right]) this.x += 5;
+        if (keys[this.controls.up] && !this.isJumping) {
+          this.dy = -10;
+          this.isJumping = true;
+        }
+        if (this.canFly && keys[this.controls.fly]) {
+          this.isFlying = true;
+          this.dy = -5;
+        } else {
+          this.isFlying = false;
+        }
+      };
       const player2 = new Player(
         300,
         canvas.height - 100,
