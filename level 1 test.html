@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Platformer with Door</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background-color: #333;
+        font-family: Arial, sans-serif;
+      }
+      #game {
+        position: relative;
+        width: 800px;
+        height: 400px;
+        margin: 50px auto;
+        background-color: #87ceeb;
+        overflow: hidden;
+        border: 2px solid #000;
+      }
+      #player {
+        position: absolute;
+        width: 30px;
+        height: 50px;
+        background-color: blue;
+        border: 2px solid white;
+        left: 50px;
+        top: 300px;
+        z-index: 10;
+      }
+      .platform {
+        position: absolute;
+        background-color: #8b4513;
+      }
+      .button {
+        position: absolute;
+        width: 40px;
+        height: 10px;
+        border: 2px solid black;
+        z-index: 5;
+      }
+      #button1 {
+        background-color: red;
+        left: 400px;
+        bottom: 50px;
+      }
+      #button2 {
+        background-color: red;
+        left: 600px;
+        bottom: 50px;
+        display: none;
+      }
+      #door {
+        position: absolute;
+        width: 40px;
+        height: 80px;
+        background-color: #8b4513;
+        border: 3px solid #654321;
+        right: 50px;
+        bottom: 50px;
+        z-index: 5;
+      }
+      #door-handle {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background-color: gold;
+        border-radius: 50%;
+        left: 5px;
+        top: 40px;
+      }
+      #door-message {
+        position: absolute;
+        top: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        white-space: nowrap;
+        display: none;
+        z-index: 20;
+      }
+      #info {
+        color: white;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin-top: 10px;
+      }
+      #floor {
+        position: absolute;
+        width: 800px;
+        height: 50px;
+        background-color: green;
+        bottom: 0;
+      }
+      #debug {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        padding: 5px;
+        z-index: 20;
+      }
+      #game-elements {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        padding: 5px;
+        z-index: 20;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game">
+      <div id="debug"><span id="player-pos"></span></div>
+      <div id="game-elements"></div>
+      <div id="player"></div>
+      <div id="floor"></div>
+      <div
+        id="platform"
+        class="platform"
+        style="left: 100px; top: 200px; width: 150px; height: 30px"
+      ></div>
+      <div id="button1" class="button"></div>
+      <div id="button2" class="button"></div>
+      <div id="door">
+        <div id="door-handle"></div>
+        <div id="door-message">LOCKED</div>
+      </div>
+    </div>
+    <div id="info">
+      Controls: A/D to move, W to jump | Player is the BLUE square | Press R to
+      reset
+    </div>
+
+    <script>
+      // Game elements
+      const player = document.getElementById("player");
+      const button1 = document.getElementById("button1");
+      const button2 = document.getElementById("button2");
+      const door = document.getElementById("door");
+      const doorMessage = document.getElementById("door-message");
+      const platform = document.getElementById("platform");
+      const floor = document.getElementById("floor");
+      const game = document.getElementById("game");
+      const playerPos = document.getElementById("player-pos");
+
+      // Player properties
+      let playerX = 50;
+      let playerY = 300;
+      let playerVelocityX = 0;
+      let playerVelocityY = 0;
+      let isJumping = false;
+      let isOnGround = true;
+
+      // Game properties
+      const gravity = 0.5;
+      const jumpPower = 12;
+      const moveSpeed = 5;
+      const gameWidth = 800;
+      const gameHeight = 400;
+
+      // Game state
+      let button1Pressed = false;
+      let button2Pressed = false;
+      let doorUnlocked = false;
+
+      // Keyboard state
+      const keys = {};
+
+      // Update player position
+      function updatePlayer() {
+        player.style.left = playerX + "px";
+        player.style.top = playerY + "px";
+        playerPos.textContent = `X: ${Math.round(playerX)}, Y: ${Math.round(
+          playerY
+        )}`;
+      }
+
+      // Force initial player position
+      function forcePlayerPosition() {
+        playerX = 50;
+        playerY = 300;
+        updatePlayer();
+      }
+
+      // Check if two elements are colliding
+      function checkCollision(
+        element1Left,
+        element1Top,
+        element1Width,
+        element1Height,
+        element2Left,
+        element2Top,
+        element2Width,
+        element2Height
+      ) {
+        return (
+          element1Left < element2Left + element2Width &&
+          element1Left + element1Width > element2Left &&
+          element1Top < element2Top + element2Height &&
+          element1Top + element1Height > element2Top
+        );
+      }
+
+      // Game loop
+      function gameLoop() {
+        // Handle horizontal movement
+        if (keys["a"] || keys["ArrowLeft"]) {
+          playerVelocityX = -moveSpeed;
+        } else if (keys["d"] || keys["ArrowRight"]) {
+          playerVelocityX = moveSpeed;
+        } else {
+          playerVelocityX = 0;
+        }
+
+        // Handle jumping
+        if ((keys["w"] || keys["ArrowUp"]) && !isJumping && isOnGround) {
+          playerVelocityY = -jumpPower;
+          isJumping = true;
+          isOnGround = false;
+        }
+
+        // Apply gravity
+        playerVelocityY += gravity;
+
+        // Update position
+        playerX += playerVelocityX;
+        playerY += playerVelocityY;
+
+        // Keep player within game bounds
+        if (playerX < 0) playerX = 0;
+        if (playerX > gameWidth - 30) playerX = gameWidth - 30;
+
+        // Reset ground state
+        isOnGround = false;
+
+        // Check floor collision
+        if (playerY + 50 > gameHeight - 50) {
+          playerY = gameHeight - 100;
+          playerVelocityY = 0;
+          isOnGround = true;
+          isJumping = false;
+        }
+
+        // Check platform collision
+        const platformLeft = 100;
+        const platformTop = 200;
+        const platformWidth = 150;
+        const platformHeight = 30;
+
+        if (
+          checkCollision(
+            playerX,
+            playerY,
+            30,
+            50,
+            platformLeft,
+            platformTop,
+            platformWidth,
+            platformHeight
+          )
+        ) {
+          // Only collide with top of platform
+          if (playerVelocityY > 0 && playerY + 45 < platformTop + 10) {
+            playerY = platformTop - 50;
+            playerVelocityY = 0;
+            isOnGround = true;
+            isJumping = false;
+          }
+        }
+
+        // Check button1 collision
+        if (
+          checkCollision(
+            playerX,
+            playerY,
+            30,
+            50,
+            400,
+            gameHeight - 60,
+            40,
+            10
+          ) &&
+          !button1Pressed
+        ) {
+          button1.style.backgroundColor = "#990000";
+          button2.style.display = "block"; // Show the second button
+          button1Pressed = true;
+        }
+
+        // Check button2 collision
+        if (
+          checkCollision(
+            playerX,
+            playerY,
+            30,
+            50,
+            600,
+            gameHeight - 60,
+            40,
+            10
+          ) &&
+          button1Pressed &&
+          !button2Pressed
+        ) {
+          button2.style.backgroundColor = "#990000";
+          button2Pressed = true;
+          doorUnlocked = true;
+          door.style.backgroundColor = "#A0522D";
+        }
+
+        // Check door collision
+        const doorLeft = gameWidth - 90;
+        const doorTop = gameHeight - 130;
+
+        if (
+          checkCollision(playerX, playerY, 30, 50, doorLeft, doorTop, 40, 80)
+        ) {
+          doorMessage.style.display = "block";
+
+          if (doorUnlocked) {
+            doorMessage.textContent = "UNLOCKED";
+            doorMessage.style.backgroundColor = "rgba(0, 128, 0, 0.7)";
+
+            // Show success message
+            if (!document.getElementById("success-message")) {
+              const message = document.createElement("div");
+              message.id = "success-message";
+              message.textContent = "Congratulations! You beat the level!";
+              message.style.position = "absolute";
+              message.style.top = "50%";
+              message.style.left = "50%";
+              message.style.transform = "translate(-50%, -50%)";
+              message.style.padding = "20px";
+              message.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+              message.style.color = "white";
+              message.style.fontSize = "24px";
+              message.style.borderRadius = "10px";
+              message.style.zIndex = "100";
+              game.appendChild(message);
+            }
+          } else {
+            doorMessage.textContent = "LOCKED";
+          }
+        } else {
+          doorMessage.style.display = "none";
+        }
+
+        // Update player position
+        updatePlayer();
+
+        // Continue the game loop
+        requestAnimationFrame(gameLoop);
+      }
+
+      // Event listeners for keyboard
+      document.addEventListener("keydown", (e) => {
+        keys[e.key.toLowerCase()] = true;
+      });
+
+      document.addEventListener("keyup", (e) => {
+        keys[e.key.toLowerCase()] = false;
+      });
+
+      // Force reset position with R key
+      document.addEventListener("keydown", (e) => {
+        if (e.key.toLowerCase() === "r") {
+          forcePlayerPosition();
+        }
+      });
+
+      // Make sure player is visible on start
+      window.onload = function () {
+        // Force player position after a small delay to ensure rendering
+        setTimeout(forcePlayerPosition, 100);
+
+        // Start the game
+        gameLoop();
+      };
+
+      // Start the game
+      forcePlayerPosition();
+      gameLoop();
+    </script>
+  </body>
+</html>
