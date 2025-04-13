@@ -1,45 +1,112 @@
-// Game state variable
+let pixel1, pixel2, cat_frame1, cat_frame2, cat_base, cat_eyes1, cat_eyes2, cat_eyes3, cat_eyes4;
+let mouse_run1, mouse_run2, bird_fly1, bird_fly2, cat_chaser, mouse, bird;
+
 let gameState = "menu";
-// Track if mouse is over a button
 let overButton = false;
-let showModal = false; // Track if modal should be displayed
+let showModal = false;
 
 let selectedCharacter1 = "mouse";
 let selectedCharacter2 = "mouse";
 let player1Confirmed = false;
 let player2Confirmed = false;
 
+let counter = 0;
+let mousePlayer, birdPlayer;
+
+let animationProgress = 0;
+let frameCounter = 0;
 let anim_catX = 80;
 let anim_mouseX = 300;
 let anim_birdX = 280;
 let anim_black_h = 100;
 
-let pixel1, pixel2;
 function preload() {
-  pixel1 = loadFont("fonts/alagard.ttf");
-  pixel2 = loadFont("fonts/minecraft_font.ttf");
+  pixel1 = loadFont("../fonts/alagard.ttf");
+  pixel2 = loadFont("../fonts/minecraft_font.ttf");
 
-  cat_frame1 = loadImage("assets/cat_walk_test1.png");
-  cat_frame2 = loadImage("assets/cat_walk_test2.png");
+  cat_frame1 = loadImage("../assets/cat_walk_test1.png");
+  cat_frame2 = loadImage("../assets/cat_walk_test2.png");
+  cat_base = loadImage("../assets/cat_base_test.png");
 
-  cat_base = loadImage("assets/cat_base_test.png");
+  cat_eyes1 = loadImage("../assets/cat_eyes_test1.png");
+  cat_eyes2 = loadImage("../assets/cat_eyes_test2.png");
+  cat_eyes3 = loadImage("../assets/cat_eyes_test3.png");
+  cat_eyes4 = loadImage("../assets/cat_eyes_test4.png");
 
-  cat_eyes1 = loadImage("assets/cat_eyes_test1.png");
-  cat_eyes2 = loadImage("assets/cat_eyes_test2.png");
-  cat_eyes3 = loadImage("assets/cat_eyes_test3.png");
-  cat_eyes4 = loadImage("assets/cat_eyes_test4.png");
+  mouse_run1 = loadImage("../assets/mouse_run_anim_test1.png");
+  mouse_run2 = loadImage("../assets/mouse_run_anim_test2.png");
 
-  mouse_run1 = loadImage("assets/mouse_run_anim_test1.png");
-  mouse_run2 = loadImage("assets/mouse_run_anim_test2.png");
+  bird_fly1 = loadImage("../assets/bird_run_anim_test1.png");
+  bird_fly2 = loadImage("../assets/bird_run_anim_test2.png");
 
-  bird_fly1 = loadImage("assets/bird_run_anim_test1.png");
-  bird_fly2 = loadImage("assets/bird_run_anim_test2.png");
+  cat_chaser = loadImage("../assets/vio_cat_test.png");
 
-  cat_chaser = loadImage("assets/vio_cat_test.png");
+  mouse = loadImage("../assets/mouse-test.png");
+  bird = loadImage("../assets/bird-test.png");
+}
 
-  mouse = loadImage("assets/mouse-test.png");
-  bird = loadImage("assets/bird-test.png");
-  arrow = loadImage("assets/arrow.png");
+class Player {
+  constructor(x, y, img, gravity, up, down, left, right, width = 200, height = 200) {
+    this.x = x;
+    this.y = y;
+    this.img = img;
+    this.gravity = gravity;
+
+    this.width = width;
+    this.height = height;
+
+    this.up = up;
+    this.down = down;
+    this.left = left;
+    this.right = right;
+
+    this.isGrounded = false;
+    this.jumpForce = 0;
+    this.velocity = 0;
+  }
+
+  move() {
+    if (this.gravity) {
+      if (this.isGrounded) {
+        this.velocity = 0;
+        if (keyIsDown(this.up)) {
+          this.velocity = -10;
+          this.isGrounded = false;
+        }
+      } else {
+        this.velocity += 0.5;
+        this.y += this.velocity;
+        if (this.y >= height - 100) {
+          this.y = height - 100;
+          this.isGrounded = true;
+        }
+      }
+
+      if (keyIsDown(this.left)) {
+        this.x -= 5;
+      }
+      if (keyIsDown(this.right)) {
+        this.x += 5;
+      }
+    } else {
+      if (keyIsDown(this.up)) {
+        this.y -= 5;
+      }
+      if (keyIsDown(this.down)) {
+        this.y += 5;
+      }
+      if (keyIsDown(this.left)) {
+        this.x -= 5;
+      }
+      if (keyIsDown(this.right)) {
+        this.x += 5;
+      }
+    }
+  }
+
+  show() {
+    image(this.img, this.x, this.y, this.width, this.height);
+  }
 }
 
 function setup() {
@@ -48,14 +115,13 @@ function setup() {
   textAlign(CENTER, CENTER);
   textFont(pixel2);
   textSize(30);
+
+  mousePlayer = new Player(100, 100, mouse, true, UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW, 100, 100);
+  birdPlayer = new Player(100, 100, bird, false, 87, 83, 65, 68);
 }
 
-let animationStarted = false;
-let animationProgress = 0;
-let frameCounter = 0;
-
 function draw() {
-  background(230, 238, 255); // Clears previous frames
+  background(230, 238, 255);
 
   if (gameState === "menu") {
     drawMenu();
@@ -65,26 +131,20 @@ function draw() {
     drawCostume();
   } else if (gameState === "level1") {
     drawLevel1();
-  } else if (gameState === "level2") {
-    // Draw level 2
-    fill(0);
-    text("Level 2", width / 2, height / 2);
-  } else if (gameState === "level3") {
-    // Draw level 3
-    fill(0);
-    text("Level 3", width / 2, height / 2);
   }
+
   if (showModal) {
     drawModal();
   }
 
   updateCursor();
   overButton = false;
+  counter++;
 
   // debug
-  //textSize(20);
-  //fill(0);
-  //text("mouseX: " + Math.floor(mouseX) + " mouseY: " + Math.floor(mouseY), 200, 100);
+  // textSize(20);
+  // fill(0);
+  // text("mouseX: " + Math.floor(mouseX) + " mouseY: " + Math.floor(mouseY), 200, 100);
 }
 
 function drawMenu() {
@@ -106,7 +166,6 @@ function drawMenu() {
     overButton = true;
     if (mouseIsPressed) {
       console.log("Start button clicked");
-      animationStarted = true;
       gameState = "story"; // Change game state to story
     }
   }
@@ -136,30 +195,6 @@ function drawMenu() {
   text("Game Rules", 630 + 125, 450);
 }
 
-function drawModal() {
-  // Modal background
-  fill(255);
-  stroke(0);
-  rect(400, 200, 400, 250, 20);
-
-  // Modal text
-  fill(0);
-  textSize(30);
-  text("Game Rules", 600, 230);
-  textSize(20);
-  text("1. Use arrow keys to move.", 600, 280);
-  text("2. Avoid obstacles.", 600, 320);
-  text("3. Reach the goal to win!", 600, 360);
-
-  // Close button (X)
-  fill(255, 0, 0);
-  ellipse(770, 220, 30, 30);
-  fill(255);
-  textSize(20);
-  text("X", 771, 218);
-}
-
-// story animation
 function drawStory() {
   background(100, 0, 0);
   if (animationProgress < 100) {
@@ -224,7 +259,6 @@ function drawStory() {
     animationProgress++;
   } else {
     gameState = "costume";
-    animationStarted = false;
     animationProgress = 0;
   }
 }
@@ -308,10 +342,54 @@ function drawCostume() {
 
   if (player1Confirmed && player2Confirmed) {
     gameState = "level1";
+    counter = 0;
   }
 }
 
-// Check for close button click
+function drawModal() {
+  // Modal background
+  fill(255);
+  stroke(0);
+  rect(400, 200, 400, 250, 20);
+
+  // Modal text
+  fill(0);
+  textSize(30);
+  text("Game Rules", 600, 230);
+  textSize(20);
+  text("1. Use arrow keys to move.", 600, 280);
+  text("2. Avoid obstacles.", 600, 320);
+  text("3. Reach the goal to win!", 600, 360);
+
+  // Close button (X)
+  fill(255, 0, 0);
+  ellipse(770, 220, 30, 30);
+  fill(255);
+  textSize(20);
+  text("X", 771, 218);
+}
+
+function drawLevel1() {
+  if (counter > 200) {
+    mousePlayer.show();
+    mousePlayer.move();
+
+    birdPlayer.show();
+    birdPlayer.move();
+  } else {
+    fill(0);
+    text("Level 1", width / 2, height / 2);
+  }
+}
+
+function updateCursor() {
+  if (overButton || (showModal && dist(mouseX, mouseY, 770, 220) < 15)) {
+    cursor(HAND);
+  } else {
+    cursor(ARROW);
+  }
+}
+
 function mousePressed() {
   // If close button (X) is clicked
   if (showModal && dist(mouseX, mouseY, 770, 220) < 15) {
@@ -375,16 +453,18 @@ function mousePressed() {
   }
 }
 
-function drawLevel1() {
-  fill(0);
-  text("Level 1", width / 2, height / 2);
-  text("Hi");
-}
+class boxItem {
+  constructor(x, y, w, h, color) {
+    this.color = color;
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+  }
 
-function updateCursor() {
-  if (overButton || (showModal && dist(mouseX, mouseY, 770, 220) < 15)) {
-    cursor(HAND);
-  } else {
-    cursor(ARROW);
+  show() {
+    fill(this.color);
+    stroke(0);
+    rect(this.x, this.y, this.w, this.h, 20);
   }
 }
