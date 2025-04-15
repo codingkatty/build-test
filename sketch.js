@@ -9,7 +9,7 @@ let pixel1,
   cat_eyes4;
 let mouse_run1, mouse_run2, bird_fly1, bird_fly2, cat_chaser, mouse, bird;
 
-let gameState = "costume";
+let gameState = "menu";
 let overButton = false;
 let showModal = false;
 
@@ -28,13 +28,14 @@ let anim_mouseX = 300;
 let anim_birdX = 280;
 let anim_black_h = 100;
 
-let timerDuration = 60; // 3 minutes in seconds
+let timerDuration = 120;
 let currentTime = timerDuration;
 let timerStarted = false;
 let timerPaused = false;
 let lastTime = 0;
 
 let boxes = [];
+let bgm;
 
 function preload() {
   pixel1 = loadFont("../fonts/alagard.ttf");
@@ -59,6 +60,9 @@ function preload() {
 
   mouse = loadImage("../assets/mouse-vio.png");
   bird = loadImage("../assets/birdieeee.png");
+
+  bgm = loadSound("../assets/scary_song.mp3");
+  bgm.setVolume(0.4);
 }
 
 class Player {
@@ -208,9 +212,10 @@ function setup() {
   textAlign(CENTER, CENTER);
   textFont(pixel2);
   textSize(30);
+  bgm.loop();
 
   mousePlayer = new Player(
-    100,
+    200,
     100,
     mouse,
     true,
@@ -218,10 +223,10 @@ function setup() {
     DOWN_ARROW,
     LEFT_ARROW,
     RIGHT_ARROW,
-    100,
-    100
+    80,
+    80
   );
-  birdPlayer = new Player(100, 100, bird, false, 87, 83, 65, 68, 100, 100);
+  birdPlayer = new Player(100, 100, bird, false, 87, 83, 65, 68, 150, 150);
 }
 
 function draw() {
@@ -235,6 +240,16 @@ function draw() {
     drawCostume();
   } else if (gameState === "level1") {
     drawLevel1();
+  } else if (gameState === "level1door") {
+    drawLevel1Door();
+  } else if (gameState === "correct") {
+    correct();
+  } else if (gameState === "level2") {
+    fill(0)
+    textSize(50);
+    text("Level 2", width / 2, height / 2);
+  } else if (gameState === "gameover") {
+    background(0, 0, 0);
   }
 
   if (showModal) {
@@ -287,15 +302,15 @@ function updateTimer() {
       timerStarted = false;
       // Handle time's up event
       console.log("Time's up!");
-      // You can add game over logic here
+      gameState = "gameover";
     }
   }
 }
 
-function drawTimer() {
+function drawTimer(c=0) {
   // Draw timer UI
   push();
-  fill(0);
+  fill(c);
   noStroke();
   textSize(24);
   textAlign(LEFT, TOP);
@@ -513,15 +528,15 @@ function drawCostume() {
 function updatePlayerControls() {
   // Player 1 (WASD)
   if (selectedCharacter1 === "mouse") {
-    mousePlayer = new Player(100, 100, mouse, true, 87, 83, 65, 68, 100, 100); // W,S,A,D
+    mousePlayer = new Player(200, 100, mouse, true, 87, 83, 65, 68, 80, 80); // W,S,A,D
   } else {
-    birdPlayer = new Player(100, 100, bird, false, 87, 83, 65, 68, 100, 100); // W,S,A,D
+    birdPlayer = new Player(100, 100, bird, false, 87, 83, 65, 68, 150, 150); // W,S,A,D
   }
 
   // Player 2 (Arrow Keys)
   if (selectedCharacter2 === "mouse") {
     mousePlayer = new Player(
-      100,
+      200,
       100,
       mouse,
       true,
@@ -529,8 +544,8 @@ function updatePlayerControls() {
       DOWN_ARROW,
       LEFT_ARROW,
       RIGHT_ARROW,
-      100,
-      100
+      80,
+      80
     );
   } else {
     birdPlayer = new Player(
@@ -542,8 +557,8 @@ function updatePlayerControls() {
       DOWN_ARROW,
       LEFT_ARROW,
       RIGHT_ARROW,
-      100,
-      100
+      150,
+      150
     );
   }
 }
@@ -578,8 +593,24 @@ let newButtonX, newButtonY, newButtonW, newButtonH;
 let newButtonActivated = false;
 let newButtonHovered = false;
 let doorUnlocked = false;
-let doorMessage = "";
 let doorMessageTimeout = 0;
+let mouseBlock = null;
+let mouseBlockIndex = -1;
+
+let mouseHole = [30, 555, 100, 300];
+// doors data
+let doorsRiddle = [
+  { x: 200, y: 200, w: 150, h: 200, c: [204, 51, 0] },
+  { x: 525, y: 200, w: 150, h: 200, c: [0, 204, 180] }, 
+  { x: 850, y: 200, w: 150, h: 200, c: [102, 0, 255] },
+]
+let riddles = [
+  "The second letter of the alphabet,\nand a very long stick.\nIts rather twisted;\nthough it closes up.",
+  "Maybe the sky,\nor maybe the sea.\nWhat I see?\nthe sacred color of mice.",
+  "Heartbroken,\nflooded in tears of blood.\nRoses aren't red;\nso aren't violets..."
+]
+let randomR = Math.floor(Math.random() * 3);
+let hinttxt = "are mice colorblind??";
 
 function setupLevel1() {
   boxes = [];
@@ -588,13 +619,16 @@ function setupLevel1() {
   boxes.push(new boxItem(300, height - 200, 200, 30, color(100, 70, 50))); // Main platform
   boxes.push(new boxItem(600, height - 300, 200, 30, color(100, 70, 50))); // Higher platform
 
-  // Modified door to work with puzzle system
-  boxes.push(
-    new boxItem(width - 50, height - 200, 50, 200, color(160, 82, 45))
-  ); // Door
+  if (!doorUnlocked) {
+    boxes.push(new boxItem(width - 50, height - 200, 50, 200, color(160, 82, 45)));
+  }
 
   // Ground
   boxes.push(new boxItem(0, height - 20, width, 30, color(100, 50, 50)));
+  // pressure plate activated blocker
+  mouseBlockIndex = boxes.length;
+  mouseBlock = new boxItem(0, 520, 150, 100, color(0, 180, 0));
+  boxes.push(mouseBlock);
 
   // Button positions (relative to your level design)
   buttonW = 80;
@@ -611,92 +645,148 @@ function setupLevel1() {
 }
 
 function drawLevel1() {
-  if (counter === 200) {
+  if (counter === 100) {
     setupLevel1();
     resetTimer();
     startTimer();
   }
 
-  if (counter > 200) {
-    updateTimer();
-
-    drawTimer();
-
-    if (currentTime <= 0) {
-      // Handle game over
-      fill(0);
-      textSize(50);
-      text("Time's Up!", width / 2, height / 2);
+  if (counter > 100) {
+    if (doorUnlocked) {
+      fill(0, 255, 0);
+      textSize(30);
+      text("Level 2 ->", width - 100, 300);
+      if (mousePlayer.x > width && birdPlayer.x > width) {
+        gameState = "level2";
+        doorUnlocked = false;
+      }
     }
+
+    // hint, top right corner
+    fill(0, 0, 0);
+    textSize(20);
+    push();
+    translate(width - 100, 70);
+    rotate(-75);
+    text(hinttxt, 0, 0);
+    pop();
+
+    updateTimer();
+    drawTimer();
+    drawMouseHole();
     // Draw boxes
     for (let box of boxes) {
       box.show();
-      if (debugMode) box.showDebug();
     }
 
-    // Draw buttons (on top of platforms)
     drawFirstButton();
     if (newButtonActivated) {
       drawSecondButton();
     }
-
-    // Handle button interactions
     checkButtonInteractions();
-
-    // Check door interaction
-    checkDoorInteraction();
-
-    // Display door message if active
-    if (doorMessage && frameCount - doorMessageTimeout < 60) {
-      fill(0);
-      noStroke();
-      textSize(16);
-      text(doorMessage, width - 75, height - 220);
-    }
 
     mousePlayer.show();
     mousePlayer.move(boxes);
-    if (debugMode) {
-      // Show player bounds
-      noFill();
-      stroke(0, 255, 0);
-      rect(mousePlayer.x, mousePlayer.y, mousePlayer.width, mousePlayer.height);
-      // Show player info
-      fill(0);
-      noStroke();
-      textSize(12);
-      text(
-        `X: ${Math.round(mousePlayer.x)} Y: ${Math.round(mousePlayer.y)}`,
-        mousePlayer.x,
-        mousePlayer.y - 10
-      );
-      text(
-        `Velocity: ${Math.round(mousePlayer.velocity)}`,
-        mousePlayer.x,
-        mousePlayer.y - 25
-      );
-      text(
-        `Grounded: ${mousePlayer.isGrounded}`,
-        mousePlayer.x,
-        mousePlayer.y - 40
-      );
-    }
 
     birdPlayer.show();
     birdPlayer.move(boxes);
-    if (debugMode) {
-      noFill();
-      stroke(0, 0, 255);
-      rect(birdPlayer.x, birdPlayer.y, birdPlayer.width, birdPlayer.height);
-    }
+
   } else {
     fill(0);
+    textSize(50);
     text("Level 1", width / 2, height / 2);
   }
+}
 
-  // Debug toggle
-  if (keyIsPressed && key === "d") {
-    debugMode = !debugMode;
+function drawLevel1Door() {
+  background(0);
+  updateTimer();
+  drawTimer(color(255, 255, 255));
+
+  for (let door of doorsRiddle) {
+    if (collideRectRect(
+      mousePlayer.x,
+      mousePlayer.y,
+      mousePlayer.width,
+      mousePlayer.height,
+      door.x,
+      door.y,
+      door.w,
+      door.h
+    )) { stroke(255, 215, 0); } else { stroke(0); }
+    strokeWeight(5);
+    fill(door.c[0], door.c[1], door.c[2]);
+    rect(door.x, door.y, door.w, door.h);
+
+    noStroke();
+    // door knob
+    fill(255, 215, 0);
+    circle(door.x + door.w - 120, door.y + 80, 20);
+  }
+
+  textSize(30);
+  fill(255);
+  textAlign(CENTER);
+  text("You find yourself in front of 3 doors...\nTwo would lead to your doom. Choose wisely. (press 'e')", width / 2, 100);
+  
+  textAlign(LEFT);
+  text(riddles[randomR], 30, 500);
+  mousePlayer.show();
+  mousePlayer.move(boxes);
+
+  // door collide
+  for (let i = 0; i < doorsRiddle.length; i++) {
+    let door = doorsRiddle[i];
+    if (collideRectRect(
+      mousePlayer.x,
+      mousePlayer.y,
+      mousePlayer.width,
+      mousePlayer.height,
+      door.x,
+      door.y,
+      door.w,
+      door.h
+    )) {
+      if (collideRectRect(
+        mousePlayer.x,
+        mousePlayer.y,
+        mousePlayer.width,
+        mousePlayer.height,
+        doorsRiddle[2].x,
+        doorsRiddle[2].y,
+        doorsRiddle[2].w,
+        doorsRiddle[2].h
+      ) && keyIsDown(69)) {
+        console.log("win")
+        gameState = "correct"
+      } else if (keyIsDown(69)) {
+        console.log("lose")
+        gameState = "gameover";
+      }
+    }
+  }
+}
+
+let texty = 500
+function correct() {
+  background(0, 30, 0);
+  fill(255);
+  textSize(80);
+  textAlign(CENTER);
+  text("Correct.", width / 2, texty);
+
+  if (texty > 350) {
+    texty -= 1;
+    counter = 0;
+  } else if (counter > 100) {
+    gameState = "level1";
+    doorUnlocked = true;
+    setupLevel1();
+    mousePlayer.gravity = true;
+    mousePlayer.x = 200;
+    hinttxt = "yeah. duh.";
+  } else {
+    counter += 2;
   }
 }
 
@@ -727,10 +817,22 @@ function checkButtonInteractions() {
   // Activate first button on hover
   if (buttonHovered) {
     console.log("Button hovered");
-    buttonActivated = true;
-    newButtonActivated = true;
+    if (mouseBlockIndex >= 0 && mouseBlockIndex < boxes.length) {
+      boxes.splice(mouseBlockIndex, 1);
+      mouseBlockIndex = -1;
+      buttonActivated = true;
+    }
+  } else {
+    if (mouseBlockIndex === -1) {
+      mouseBlock = new boxItem(30, 480, 150, 100, color(0, 180, 0));
+      boxes.push(mouseBlock);
+      mouseBlockIndex = boxes.length - 1;
+      buttonActivated = false;
+    }
   }
-
+    //newButtonActivated = true;
+  
+/*
   // Second button hover check (only if active)
   if (newButtonActivated) {
     newButtonHovered =
@@ -754,6 +856,23 @@ function checkButtonInteractions() {
         newButtonW,
         newButtonH
       );
+  }*/
+
+  mouseHoleDetect = collideRectRect(
+    mousePlayer.x,
+    mousePlayer.y,
+    mousePlayer.width,
+    mousePlayer.height,
+    mouseHole[0],
+    mouseHole[1],
+    mouseHole[2],
+    mouseHole[3]
+  );
+  if (mouseHoleDetect) {
+    console.log("mouse hole!!");
+    gameState = "level1door";
+    boxes = [];
+    mousePlayer.gravity = false;
   }
 }
 
@@ -765,7 +884,7 @@ function drawFirstButton() {
   noStroke();
   rect(buttonX, buttonY, buttonW, buttonH);
 }
-
+/*
 function drawSecondButton() {
   if (newButtonHovered) fill(255, 255, 0); // Yellow when hovering
   else fill(0, 255, 0); // Green normally
@@ -779,39 +898,13 @@ function drawSecondButton() {
     doorMessage = "Door Unlocked!";
     doorMessageTimeout = frameCount;
   }
-}
+}*/
 
-function checkDoorInteraction() {
-  // Check if player is touching door (last box is the door)
-  let door = boxes[2];
-  let nearDoor = collideRectRect(
-    mousePlayer.x,
-    mousePlayer.y,
-    mousePlayer.width,
-    mousePlayer.height,
-    door.x,
-    door.y,
-    door.width,
-    door.height
-  );
-
-  if (nearDoor) {
-    if (!doorUnlocked) {
-      doorMessage = "Locked";
-      doorMessageTimeout = frameCount;
-    } else {
-      // Handle door opening/level completion here
-      // For example: currentLevel++; setupLevel();
-      doorMessage = "Enter to proceed";
-      doorMessageTimeout = frameCount;
-
-      // Example of handling level completion (you'll need to implement your own logic)
-      if (keyIsPressed && key === "e") {
-        // Proceed to next level
-        console.log("Level completed!");
-      }
-    }
-  }
+function drawMouseHole () {
+  fill(0, 0, 0);
+  noStroke();
+  rect(mouseHole[0], mouseHole[1], mouseHole[2], mouseHole[3]);
+  circle(mouseHole[0] + mouseHole[2] /2, mouseHole[1], mouseHole[2]);
 }
 
 // Helper function for rectangle collision
@@ -823,16 +916,6 @@ function collideRectRect(x1, y1, w1, h1, x2, y2, w2, h2) {
     x1 + w1 > x2 - overlap &&
     y1 < y2 + h2 + overlap &&
     y1 + h1 > y2 - overlap;
-
-  if (debugMode) {
-    // Visual debug for collision boxes
-    push();
-    noFill();
-    stroke(collision ? color(0, 255, 0) : color(255, 0, 0));
-    rect(x1, y1, w1, h1);
-    rect(x2, y2, w2, h2);
-    pop();
-  }
 
   return collision;
 }
@@ -921,13 +1004,5 @@ class boxItem {
     stroke(0);
     strokeWeight(2);
     rect(this.x, this.y, this.w, this.h); // Removed rounded corners for better collision
-  }
-
-  // Debug method to show collision bounds
-  showDebug() {
-    noFill();
-    stroke(255, 0, 0);
-    strokeWeight(1);
-    rect(this.x, this.y, this.w, this.h);
   }
 }
