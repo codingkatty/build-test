@@ -559,9 +559,9 @@ function drawModal() {
   textSize(30);
   text("Game Rules", 600, 230);
   textSize(20);
-  text("1. Use arrow keys to move.", 600, 280);
-  text("2. Avoid obstacles.", 600, 320);
-  text("3. Reach the goal to win!", 600, 360);
+  text("1. Use arrow keys & WASD to move.", 600, 280);
+  text("2. Work together.", 600, 320);
+  text("3. Use your brain!", 600, 360);
 
   // Close button (X)
   fill(255, 0, 0);
