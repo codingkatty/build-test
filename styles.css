@@ -64,7 +64,8 @@ button {
     color: #ffffff;
     background-color: rgb(21, 62, 100);
     padding: 15px 40px 15px 40px;
-    margin: 10px;
+    margin-left: 5px;
+    margin-top: 25px;
     font-size: 20px;
     font-family: "Alagard", system-ui;
     border: 0;
