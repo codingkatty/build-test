@@ -28,6 +28,12 @@ let anim_mouseX = 300;
 let anim_birdX = 280;
 let anim_black_h = 100;
 
+let timerDuration = 180; // 3 minutes in seconds
+let currentTime = timerDuration;
+let timerStarted = false;
+let timerPaused = false;
+let lastTime = 0;
+
 let boxes = [];
 
 function preload() {
@@ -91,22 +97,44 @@ class Player {
     let prevY = this.y;
 
     if (this.gravity) {
+      // Reset grounded state
+      this.isGrounded = false;
+
+      // Check if player is on ground
+      for (let box of boxList) {
+        if (
+          this.x + this.width > box.x + 5 &&
+          this.x < box.x + box.w - 5 &&
+          Math.abs(this.y + this.height - box.y) < 2
+        ) {
+          this.isGrounded = true;
+          break;
+        }
+      }
+
+      // Handle jumping
       if (this.isGrounded) {
         if (keyIsDown(this.up)) {
           this.velocity = -10;
           this.isGrounded = false;
+        } else {
+          this.velocity = 0;
         }
       } else {
         this.velocity += 0.5; // Gravity
       }
 
+      // Apply vertical movement
       this.y += this.velocity;
       if (this.checkCollision(boxList)) {
         this.y = prevY;
-        this.velocity = 0; // Reset velocity on collision
+        if (this.velocity > 0) {
+          this.isGrounded = true;
+        }
+        this.velocity = 0;
       }
 
-      prevX = this.x;
+      // Apply horizontal movement
       if (keyIsDown(this.left)) {
         this.x -= 5;
         if (this.checkCollision(boxList)) {
@@ -120,10 +148,7 @@ class Player {
         }
       }
     } else {
-      // Flying character movement (bird)
-      prevX = this.x;
-      prevY = this.y;
-
+      // Flying character (bird) movement remains the same
       if (keyIsDown(this.up)) {
         this.y -= 5;
         if (this.checkCollision(boxList)) {
@@ -224,6 +249,65 @@ function draw() {
   // textSize(20);
   // fill(0);
   // text("mouseX: " + Math.floor(mouseX) + " mouseY: " + Math.floor(mouseY), 200, 100);
+}
+
+function startTimer() {
+  timerStarted = true;
+  timerPaused = false;
+  lastTime = millis();
+}
+
+function pauseTimer() {
+  timerPaused = true;
+}
+
+function resumeTimer() {
+  if (timerStarted) {
+    timerPaused = false;
+    lastTime = millis();
+  }
+}
+
+function resetTimer() {
+  currentTime = timerDuration;
+  timerStarted = false;
+  timerPaused = false;
+}
+
+function updateTimer() {
+  if (timerStarted && !timerPaused) {
+    let currentMillis = millis();
+    let deltaTime = (currentMillis - lastTime) / 1000; // Convert to seconds
+    lastTime = currentMillis;
+
+    currentTime -= deltaTime;
+
+    if (currentTime <= 0) {
+      currentTime = 0;
+      timerStarted = false;
+      // Handle time's up event
+      console.log("Time's up!");
+      // You can add game over logic here
+    }
+  }
+}
+
+function drawTimer() {
+  // Draw timer UI
+  push();
+  fill(0);
+  noStroke();
+  textSize(24);
+  textAlign(LEFT, TOP);
+
+  // Convert seconds to MM:SS format
+  let minutes = Math.floor(currentTime / 60);
+  let seconds = Math.floor(currentTime % 60);
+  let timeString = nf(minutes, 2) + ":" + nf(seconds, 2);
+
+  // Draw timer and controls
+  text(timeString, 10, 10);
+  pop();
 }
 
 function drawMenu() {
@@ -353,7 +437,7 @@ function drawCostume() {
 
   // Player 1 selection
   textSize(30);
-  text("Player 1", 300, 200);
+  text("Player 1 (wasd)", 300, 200);
 
   // Left arrow button
   if (mouseX > 150 && mouseX < 180 && mouseY > 270 && mouseY < 330) {
@@ -363,9 +447,9 @@ function drawCostume() {
 
   // Display current character
   if (selectedCharacter1 === "mouse") {
-    image(mouse, 140, 170, 340, 340);
+    image(mouse, 185, 240, 220, 190);
   } else {
-    image(bird, 140, 170, 340, 340);
+    image(bird, 200, 240, 200, 200);
   }
 
   // Right arrow button
@@ -375,7 +459,7 @@ function drawCostume() {
   triangle(440, 300, 410, 270, 410, 330);
 
   // Player 2 selection
-  text("Player 2", 900, 200);
+  text("Player 2 (arrow keys)", 900, 200);
 
   // Left arrow button
   if (mouseX > 760 && mouseX < 790 && mouseY > 270 && mouseY < 330) {
@@ -385,9 +469,9 @@ function drawCostume() {
 
   // Display current character
   if (selectedCharacter2 === "mouse") {
-    image(mouse, 750, 170, 340, 340);
+    image(mouse, 800, 240, 220, 190);
   } else {
-    image(bird, 750, 170, 340, 340);
+    image(bird, 800, 240, 200, 200);
   }
 
   // Right arrow button
@@ -420,8 +504,47 @@ function drawCostume() {
   }
 
   if (player1Confirmed && player2Confirmed) {
+    updatePlayerControls();
     gameState = "level1";
     counter = 0;
+  }
+}
+
+function updatePlayerControls() {
+  // Player 1 (WASD)
+  if (selectedCharacter1 === "mouse") {
+    mousePlayer = new Player(100, 100, mouse, true, 87, 83, 65, 68, 100, 100); // W,S,A,D
+  } else {
+    birdPlayer = new Player(100, 100, bird, false, 87, 83, 65, 68, 100, 100); // W,S,A,D
+  }
+
+  // Player 2 (Arrow Keys)
+  if (selectedCharacter2 === "mouse") {
+    mousePlayer = new Player(
+      100,
+      100,
+      mouse,
+      true,
+      UP_ARROW,
+      DOWN_ARROW,
+      LEFT_ARROW,
+      RIGHT_ARROW,
+      100,
+      100
+    );
+  } else {
+    birdPlayer = new Player(
+      100,
+      100,
+      bird,
+      false,
+      UP_ARROW,
+      DOWN_ARROW,
+      LEFT_ARROW,
+      RIGHT_ARROW,
+      100,
+      100
+    );
   }
 }
 
@@ -448,7 +571,6 @@ function drawModal() {
   text("X", 771, 218);
 }
 
-// Add these variables with your other game variables
 let buttonX, buttonY, buttonW, buttonH;
 let buttonActivated = false;
 let buttonHovered = false;
@@ -491,9 +613,21 @@ function setupLevel1() {
 function drawLevel1() {
   if (counter === 200) {
     setupLevel1();
+    resetTimer();
+    startTimer();
   }
 
   if (counter > 200) {
+    updateTimer();
+
+    drawTimer();
+
+    if (currentTime <= 0) {
+      // Handle game over
+      fill(0);
+      textSize(50);
+      text("Time's Up!", width / 2, height / 2);
+    }
     // Draw boxes
     for (let box of boxes) {
       box.show();
@@ -567,36 +701,59 @@ function drawLevel1() {
 }
 
 function checkButtonInteractions() {
-  // First button hover check (using mousePlayer)
-  buttonHovered = collideRectRect(
-    mousePlayer.x,
-    mousePlayer.y,
-    mousePlayer.width,
-    mousePlayer.height,
-    buttonX,
-    buttonY,
-    buttonW,
-    buttonH
-  );
-
-  // Activate first button on hover
-  if (buttonHovered) {
-    buttonActivated = true;
-    newButtonActivated = true; // Show second button
-  }
-
-  // Second button hover check (only if active)
-  if (newButtonActivated) {
-    newButtonHovered = collideRectRect(
+  // Check both players for button interactions
+  buttonHovered =
+    collideRectRect(
       mousePlayer.x,
       mousePlayer.y,
       mousePlayer.width,
       mousePlayer.height,
-      newButtonX,
-      newButtonY,
-      newButtonW,
-      newButtonH
+      buttonX,
+      buttonY,
+      buttonW,
+      buttonH
+    ) ||
+    collideRectRect(
+      birdPlayer.x,
+      birdPlayer.y,
+      birdPlayer.width,
+      birdPlayer.height,
+      buttonX,
+      buttonY,
+      buttonW,
+      buttonH
     );
+
+  // Activate first button on hover
+  if (buttonHovered) {
+    console.log("Button hovered");
+    buttonActivated = true;
+    newButtonActivated = true;
+  }
+
+  // Second button hover check (only if active)
+  if (newButtonActivated) {
+    newButtonHovered =
+      collideRectRect(
+        mousePlayer.x,
+        mousePlayer.y,
+        mousePlayer.width,
+        mousePlayer.height,
+        newButtonX,
+        newButtonY,
+        newButtonW,
+        newButtonH
+      ) ||
+      collideRectRect(
+        birdPlayer.x,
+        birdPlayer.y,
+        birdPlayer.width,
+        birdPlayer.height,
+        newButtonX,
+        newButtonY,
+        newButtonW,
+        newButtonH
+      );
   }
 }
 
@@ -659,7 +816,25 @@ function checkDoorInteraction() {
 
 // Helper function for rectangle collision
 function collideRectRect(x1, y1, w1, h1, x2, y2, w2, h2) {
-  return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
+  // Make collision detection more forgiving with a small overlap threshold
+  const overlap = 5;
+  const collision =
+    x1 < x2 + w2 + overlap &&
+    x1 + w1 > x2 - overlap &&
+    y1 < y2 + h2 + overlap &&
+    y1 + h1 > y2 - overlap;
+
+  if (debugMode) {
+    // Visual debug for collision boxes
+    push();
+    noFill();
+    stroke(collision ? color(0, 255, 0) : color(255, 0, 0));
+    rect(x1, y1, w1, h1);
+    rect(x2, y2, w2, h2);
+    pop();
+  }
+
+  return collision;
 }
 function updateCursor() {
   if (overButton || (showModal && dist(mouseX, mouseY, 770, 220) < 15)) {
