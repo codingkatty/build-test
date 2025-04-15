@@ -1,30 +1,33 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Cat Escape</title>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="icon" href="assets/favicon.svg">
-</head>
-<body>
-  <header>
-    <img src="assets/title.svg">
-  </header>
-  <main>
-    <section id="intro">
-      <div id="intro-c">
-        <div>
-          <h1>Escape the cat!</h1>
-          <p>
-            We've created an interactive experience with lovely P5.JS and we're excited to have you check it out!!! Its
-            an escape room game where you solve puzzles to escape the cat. The game is designed to be played on desktop or
-            laptop devices. If you encounter issues of game not displaying, please try resizing your browser window!
-          </p>
+  <head>
+    <title>Cat Escape</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" href="assets/favicon.svg" />
+  </head>
+  <body>
+    <header>
+      <img src="assets/title.svg" />
+    </header>
+    <main>
+      <section id="intro">
+        <div id="intro-c">
+          <div>
+            <h1>Escape the cat!</h1>
+            <p>
+              We've created an interactive experience with lovely P5.JS and
+              we're excited to have you check it out!!! Its an escape room game
+              where you solve puzzles to escape the cat. The game is designed to
+              be played on desktop or laptop devices. If you encounter issues of
+              game not displaying, please try resizing your browser window!
+            </p>
+          </div>
+
+          <img src="assets/cat-thumbnail-ph.png" />
         </div>
 
-        <img src="assets/cat-thumbnail-ph.png">
-      </div>
-
-      <button onclick="
+        <button
+          onclick="
         fetch('/game')
           .then(response => {
             if (response.ok) {
@@ -39,17 +42,37 @@
         .catch(() => {
           window.location.href = 'game.html';
         })
-      ">Play the game!!</button>
-    </section>
+      "
+        >
+          Play the game!!
+        </button>
+      </section>
 
-    <section id="how">
-      <h2>How to play</h2>
-      <p>lorem ipsum</p>
-    </section>
+      <section id="how">
+        <h2>How to play</h2>
+        <p>
+          Two players must work together to escape before time runs out. One
+          player uses the arrow keys, the other uses WASD. Each character has
+          unique abilities—one can fly, and the other can slip through tight
+          spaces. Use your strengths, solve puzzles, and communicate well... or
+          face the consequences.
+        </p>
+      </section>
 
-  </main>
-  <footer>
-    <p>made with love by candy and violetz</p>
-  </footer>
-</body>
+      <section id="Gallery">
+        <h2>Gallery</h2>
+      </section>
+
+      <section id="Tutorial">
+        <h2>Video Tutorial</h2>
+        <video width="640" height="360" controls id="video">
+          <source src="https://example.com/video.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </section>
+    </main>
+    <footer>
+      <p>made with love by candy and violetz</p>
+    </footer>
+  </body>
 </html>
