@@ -28,7 +28,7 @@ let anim_mouseX = 300;
 let anim_birdX = 280;
 let anim_black_h = 100;
 
-let timerDuration = 180; // 3 minutes in seconds
+let timerDuration = 60; // 3 minutes in seconds
 let currentTime = timerDuration;
 let timerStarted = false;
 let timerPaused = false;
