@@ -1,4 +1,12 @@
-let pixel1, pixel2, cat_frame1, cat_frame2, cat_base, cat_eyes1, cat_eyes2, cat_eyes3, cat_eyes4;
+let pixel1,
+  pixel2,
+  cat_frame1,
+  cat_frame2,
+  cat_base,
+  cat_eyes1,
+  cat_eyes2,
+  cat_eyes3,
+  cat_eyes4;
 let mouse_run1, mouse_run2, bird_fly1, bird_fly2, cat_chaser, mouse, bird;
 
 let gameState = "menu";
@@ -19,6 +27,8 @@ let anim_catX = 80;
 let anim_mouseX = 300;
 let anim_birdX = 280;
 let anim_black_h = 100;
+
+let boxes = [];
 
 function preload() {
   pixel1 = loadFont("../fonts/alagard.ttf");
@@ -46,7 +56,18 @@ function preload() {
 }
 
 class Player {
-  constructor(x, y, img, gravity, up, down, left, right, width = 200, height = 200) {
+  constructor(
+    x,
+    y,
+    img,
+    gravity,
+    up,
+    down,
+    left,
+    right,
+    width = 200,
+    height = 200
+  ) {
     this.x = x;
     this.y = y;
     this.img = img;
@@ -65,30 +86,30 @@ class Player {
     this.velocity = 0;
   }
 
-  move() {
+  move(boxList) {
     if (this.gravity) {
       if (this.isGrounded) {
-        this.velocity = 0;
         if (keyIsDown(this.up)) {
           this.velocity = -10;
           this.isGrounded = false;
         }
       } else {
-        this.velocity += 0.5;
-        this.y += this.velocity;
-        if (this.y >= height - 100) {
-          this.y = height - 100;
-          this.isGrounded = true;
-        }
+        this.velocity += 0.5; // Gravity
       }
+
+      this.y += this.velocity;
+      this.collision(boxList);
 
       if (keyIsDown(this.left)) {
         this.x -= 5;
+        this.collision(boxList);
       }
       if (keyIsDown(this.right)) {
         this.x += 5;
+        this.collision(boxList);
       }
     } else {
+      // Flying character movement (bird)
       if (keyIsDown(this.up)) {
         this.y -= 5;
       }
@@ -101,6 +122,66 @@ class Player {
       if (keyIsDown(this.right)) {
         this.x += 5;
       }
+      this.collision(boxList);
+    }
+  }
+
+  collision(boxList) {
+    // Store previous position
+    let prevX = this.x;
+    let prevY = this.y;
+    let nextY = this.y + this.velocity;
+
+    // Reset grounded state
+    this.isGrounded = false;
+
+    for (let box of boxList) {
+      // Vertical collision check
+      if (this.x + this.width > box.x && this.x < box.x + box.w) {
+        // Landing on top of platform
+        if (
+          this.velocity > 0 &&
+          nextY + this.height > box.y &&
+          prevY + this.height <= box.y
+        ) {
+          this.y = box.y - this.height;
+          this.isGrounded = true;
+          this.velocity = 0;
+        }
+        // Hitting ceiling
+        else if (
+          this.velocity < 0 &&
+          nextY < box.y + box.h &&
+          prevY >= box.y + box.h
+        ) {
+          this.y = box.y + box.h;
+          this.velocity = 0;
+        }
+      }
+
+      // Horizontal collision check
+      if (this.y + this.height > box.y && this.y < box.y + box.h) {
+        // Collision from left
+        if (this.x + this.width > box.x && prevX + this.width <= box.x) {
+          this.x = box.x - this.width;
+        }
+        // Collision from right
+        else if (this.x < box.x + box.w && prevX >= box.x + box.w) {
+          this.x = box.x + box.w;
+        }
+        // Screen bounds
+        this.x = constrain(this.x, 0, width - this.width);
+        this.y = constrain(this.y, 0, height - this.height);
+      }
+    }
+
+    // Add screen bounds
+    this.x = constrain(this.x, 0, width - this.width);
+    this.y = constrain(this.y, 0, height - this.height);
+
+    // Update grounded state if no vertical collisions occurred
+    if (this.y < height - this.height - 1) {
+      this.isGrounded = false;
     }
   }
 
@@ -116,7 +197,18 @@ function setup() {
   textFont(pixel2);
   textSize(30);
 
-  mousePlayer = new Player(100, 100, mouse, true, UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW, 100, 100);
+  mousePlayer = new Player(
+    100,
+    100,
+    mouse,
+    true,
+    UP_ARROW,
+    DOWN_ARROW,
+    LEFT_ARROW,
+    RIGHT_ARROW,
+    100,
+    100
+  );
   birdPlayer = new Player(100, 100, bird, false, 87, 83, 65, 68);
 }
 
@@ -369,16 +461,76 @@ function drawModal() {
   text("X", 771, 218);
 }
 
+function setupLevel1() {
+  boxes = [];
+
+  // Floor
+  boxes.push(new boxItem(0, height - 50, width, 50, color(100, 70, 50)));
+
+  // Platforms and walls
+  boxes.push(new boxItem(300, height - 200, 200, 30, color(100, 70, 50)));
+  boxes.push(new boxItem(600, height - 300, 200, 30, color(100, 70, 50)));
+
+  // Walls
+  boxes.push(new boxItem(0, 0, 50, height, color(100, 70, 50)));
+  boxes.push(new boxItem(width - 50, 0, 50, height, color(100, 70, 50)));
+}
+
 function drawLevel1() {
+  if (counter === 200) {
+    setupLevel1();
+  }
+
   if (counter > 200) {
+    // Draw boxes
+    for (let box of boxes) {
+      box.show();
+      if (debugMode) box.showDebug();
+    }
+
     mousePlayer.show();
-    mousePlayer.move();
+    mousePlayer.move(boxes);
+    if (debugMode) {
+      // Show player bounds
+      noFill();
+      stroke(0, 255, 0);
+      rect(mousePlayer.x, mousePlayer.y, mousePlayer.width, mousePlayer.height);
+      // Show player info
+      fill(0);
+      noStroke();
+      textSize(12);
+      text(
+        `X: ${Math.round(mousePlayer.x)} Y: ${Math.round(mousePlayer.y)}`,
+        mousePlayer.x,
+        mousePlayer.y - 10
+      );
+      text(
+        `Velocity: ${Math.round(mousePlayer.velocity)}`,
+        mousePlayer.x,
+        mousePlayer.y - 25
+      );
+      text(
+        `Grounded: ${mousePlayer.isGrounded}`,
+        mousePlayer.x,
+        mousePlayer.y - 40
+      );
+    }
 
     birdPlayer.show();
-    birdPlayer.move();
+    birdPlayer.move(boxes);
+    if (debugMode) {
+      noFill();
+      stroke(0, 0, 255);
+      rect(birdPlayer.x, birdPlayer.y, birdPlayer.width, birdPlayer.height);
+    }
   } else {
     fill(0);
     text("Level 1", width / 2, height / 2);
+  }
+
+  // Debug toggle
+  if (keyIsPressed && key === "d") {
+    debugMode = !debugMode;
   }
 }
 
@@ -465,6 +617,15 @@ class boxItem {
   show() {
     fill(this.color);
     stroke(0);
-    rect(this.x, this.y, this.w, this.h, 20);
+    strokeWeight(2);
+    rect(this.x, this.y, this.w, this.h); // Removed rounded corners for better collision
+  }
+
+  // Debug method to show collision bounds
+  showDebug() {
+    noFill();
+    stroke(255, 0, 0);
+    strokeWeight(1);
+    rect(this.x, this.y, this.w, this.h);
   }
 }
