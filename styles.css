@@ -1,0 +1,90 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+}
+
+@font-face {
+    font-family: 'Alagard';
+    src: url('fonts/alagard.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Minecraft';
+    src: url('fonts/minecraft_font.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    font-family: 'Minecraft', sans-serif;
+}
+
+header {
+    justify-content: center;
+    display: flex;
+}
+
+h1,
+h2 {
+    font-family: 'Alagard', serif;
+    font-size: 2.5em;
+}
+
+section {
+    padding: 5%;
+}
+
+section p {
+    font-size: 1.2em;
+    margin-top: 10px;
+}
+
+main #intro {
+    background-color: rgb(230, 238, 255);
+}
+
+#intro p {
+    width: 90%;
+}
+
+#intro-c {
+    display: flex;
+    justify-content: center;
+}
+
+#intro-c img {
+    width: 80%;
+    max-width: 500px;
+    height: auto;
+}
+
+button {
+    color: #ffffff;
+    background-color: rgb(21, 62, 100);
+    padding: 15px 40px 15px 40px;
+    margin: 10px;
+    font-size: 20px;
+    font-family: "Alagard", system-ui;
+    border: 0;
+    box-shadow: 0px 5px black, 0px -5px black, 5px 0px black, -5px 0px black, 0px 10px #00000038, 5px 5px #00000038, -5px 5px #00000038, inset 0px 5px #ffffff36;
+    cursor: pointer;
+}
+
+button:active {
+    transform: translateY(5px);
+    box-shadow: 0px 5px black, 0px -5px black, 5px 0px black, -5px 0px black, inset 0px 5px #00000038;
+}
+
+button:hover {
+    background-color: rgb(25, 99, 168);
+}
+
+footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    background-color: rgb(230, 238, 255);
+}
