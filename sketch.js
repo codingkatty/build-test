@@ -9,7 +9,7 @@ let pixel1,
   cat_eyes4;
 let mouse_run1, mouse_run2, bird_fly1, bird_fly2, cat_chaser, mouse, bird;
 
-let gameState = "menu";
+let gameState = "costume";
 let overButton = false;
 let showModal = false;
 
@@ -51,8 +51,8 @@ function preload() {
 
   cat_chaser = loadImage("../assets/vio_cat_test.png");
 
-  mouse = loadImage("../assets/mouse-test.png");
-  bird = loadImage("../assets/bird-test.png");
+  mouse = loadImage("../assets/mouse-vio.png");
+  bird = loadImage("../assets/birdieeee.png");
 }
 
 class Player {
@@ -87,6 +87,9 @@ class Player {
   }
 
   move(boxList) {
+    let prevX = this.x;
+    let prevY = this.y;
+
     if (this.gravity) {
       if (this.isGrounded) {
         if (keyIsDown(this.up)) {
@@ -98,91 +101,75 @@ class Player {
       }
 
       this.y += this.velocity;
-      this.collision(boxList);
+      if (this.checkCollision(boxList)) {
+        this.y = prevY;
+        this.velocity = 0; // Reset velocity on collision
+      }
 
+      prevX = this.x;
       if (keyIsDown(this.left)) {
         this.x -= 5;
-        this.collision(boxList);
+        if (this.checkCollision(boxList)) {
+          this.x = prevX;
+        }
       }
       if (keyIsDown(this.right)) {
         this.x += 5;
-        this.collision(boxList);
+        if (this.checkCollision(boxList)) {
+          this.x = prevX;
+        }
       }
     } else {
       // Flying character movement (bird)
+      prevX = this.x;
+      prevY = this.y;
+
       if (keyIsDown(this.up)) {
         this.y -= 5;
+        if (this.checkCollision(boxList)) {
+          this.y = prevY;
+        }
       }
       if (keyIsDown(this.down)) {
         this.y += 5;
+        if (this.checkCollision(boxList)) {
+          this.y = prevY;
+        }
       }
       if (keyIsDown(this.left)) {
         this.x -= 5;
+        if (this.checkCollision(boxList)) {
+          this.x = prevX;
+        }
       }
       if (keyIsDown(this.right)) {
         this.x += 5;
+        if (this.checkCollision(boxList)) {
+          this.x = prevX;
+        }
       }
-      this.collision(boxList);
     }
   }
 
-  collision(boxList) {
-    // Store previous position
-    let prevX = this.x;
-    let prevY = this.y;
-    let nextY = this.y + this.velocity;
-
-    // Reset grounded state
-    this.isGrounded = false;
-
+  checkCollision(boxList) {
     for (let box of boxList) {
-      // Vertical collision check
-      if (this.x + this.width > box.x && this.x < box.x + box.w) {
-        // Landing on top of platform
+      if (
+        this.x < box.x + box.w &&
+        this.x + this.width > box.x &&
+        this.y < box.y + box.h &&
+        this.y + this.height > box.y
+      ) {
         if (
-          this.velocity > 0 &&
-          nextY + this.height > box.y &&
-          prevY + this.height <= box.y
+          this.x + this.width > box.x &&
+          this.x < box.x + box.w &&
+          this.y + this.height > box.y &&
+          this.y < box.y + box.h
         ) {
-          this.y = box.y - this.height;
-          this.isGrounded = true;
-          this.velocity = 0;
-        }
-        // Hitting ceiling
-        else if (
-          this.velocity < 0 &&
-          nextY < box.y + box.h &&
-          prevY >= box.y + box.h
-        ) {
-          this.y = box.y + box.h;
-          this.velocity = 0;
+          return true;
         }
       }
-
-      // Horizontal collision check
-      if (this.y + this.height > box.y && this.y < box.y + box.h) {
-        // Collision from left
-        if (this.x + this.width > box.x && prevX + this.width <= box.x) {
-          this.x = box.x - this.width;
-        }
-        // Collision from right
-        else if (this.x < box.x + box.w && prevX >= box.x + box.w) {
-          this.x = box.x + box.w;
-        }
-        // Screen bounds
-        this.x = constrain(this.x, 0, width - this.width);
-        this.y = constrain(this.y, 0, height - this.height);
-      }
     }
-
-    // Add screen bounds
-    this.x = constrain(this.x, 0, width - this.width);
-    this.y = constrain(this.y, 0, height - this.height);
-
-    // Update grounded state if no vertical collisions occurred
-    if (this.y < height - this.height - 1) {
-      this.isGrounded = false;
-    }
+    return false;
   }
 
   show() {
@@ -209,7 +196,7 @@ function setup() {
     100,
     100
   );
-  birdPlayer = new Player(100, 100, bird, false, 87, 83, 65, 68);
+  birdPlayer = new Player(100, 100, bird, false, 87, 83, 65, 68, 100, 100);
 }
 
 function draw() {
@@ -461,19 +448,44 @@ function drawModal() {
   text("X", 771, 218);
 }
 
+// Add these variables with your other game variables
+let buttonX, buttonY, buttonW, buttonH;
+let buttonActivated = false;
+let buttonHovered = false;
+let newButtonX, newButtonY, newButtonW, newButtonH;
+let newButtonActivated = false;
+let newButtonHovered = false;
+let doorUnlocked = false;
+let doorMessage = "";
+let doorMessageTimeout = 0;
+
 function setupLevel1() {
   boxes = [];
 
-  // Floor
-  boxes.push(new boxItem(0, height - 50, width, 50, color(100, 70, 50)));
-
   // Platforms and walls
-  boxes.push(new boxItem(300, height - 200, 200, 30, color(100, 70, 50)));
-  boxes.push(new boxItem(600, height - 300, 200, 30, color(100, 70, 50)));
+  boxes.push(new boxItem(300, height - 200, 200, 30, color(100, 70, 50))); // Main platform
+  boxes.push(new boxItem(600, height - 300, 200, 30, color(100, 70, 50))); // Higher platform
 
-  // Walls
-  boxes.push(new boxItem(0, 0, 50, height, color(100, 70, 50)));
-  boxes.push(new boxItem(width - 50, 0, 50, height, color(100, 70, 50)));
+  // Modified door to work with puzzle system
+  boxes.push(
+    new boxItem(width - 50, height - 200, 50, 200, color(160, 82, 45))
+  ); // Door
+
+  // Ground
+  boxes.push(new boxItem(0, height - 20, width, 30, color(100, 50, 50)));
+
+  // Button positions (relative to your level design)
+  buttonW = 80;
+  buttonH = 30;
+  buttonX = 350; // On the main platform
+  buttonY = height - 200 - buttonH - 10;
+
+  newButtonW = 80;
+  newButtonH = 30;
+  newButtonX = width - 100; // Near the door
+  newButtonY = height - 200 - newButtonH - 60;
+
+  console.log(boxes);
 }
 
 function drawLevel1() {
@@ -486,6 +498,26 @@ function drawLevel1() {
     for (let box of boxes) {
       box.show();
       if (debugMode) box.showDebug();
+    }
+
+    // Draw buttons (on top of platforms)
+    drawFirstButton();
+    if (newButtonActivated) {
+      drawSecondButton();
+    }
+
+    // Handle button interactions
+    checkButtonInteractions();
+
+    // Check door interaction
+    checkDoorInteraction();
+
+    // Display door message if active
+    if (doorMessage && frameCount - doorMessageTimeout < 60) {
+      fill(0);
+      noStroke();
+      textSize(16);
+      text(doorMessage, width - 75, height - 220);
     }
 
     mousePlayer.show();
@@ -534,6 +566,101 @@ function drawLevel1() {
   }
 }
 
+function checkButtonInteractions() {
+  // First button hover check (using mousePlayer)
+  buttonHovered = collideRectRect(
+    mousePlayer.x,
+    mousePlayer.y,
+    mousePlayer.width,
+    mousePlayer.height,
+    buttonX,
+    buttonY,
+    buttonW,
+    buttonH
+  );
+
+  // Activate first button on hover
+  if (buttonHovered) {
+    buttonActivated = true;
+    newButtonActivated = true; // Show second button
+  }
+
+  // Second button hover check (only if active)
+  if (newButtonActivated) {
+    newButtonHovered = collideRectRect(
+      mousePlayer.x,
+      mousePlayer.y,
+      mousePlayer.width,
+      mousePlayer.height,
+      newButtonX,
+      newButtonY,
+      newButtonW,
+      newButtonH
+    );
+  }
+}
+
+function drawFirstButton() {
+  if (buttonHovered && !buttonActivated)
+    fill(255, 182, 193); // Light pink when hovering
+  else if (buttonActivated) fill(139, 0, 0); // Dark red when activated
+  else fill(255, 0, 0); // Red when idle
+  noStroke();
+  rect(buttonX, buttonY, buttonW, buttonH);
+}
+
+function drawSecondButton() {
+  if (newButtonHovered) fill(255, 255, 0); // Yellow when hovering
+  else fill(0, 255, 0); // Green normally
+
+  noStroke();
+  rect(newButtonX, newButtonY, newButtonW, newButtonH);
+
+  // Unlock door when hovered (could change to require key press)
+  if (newButtonHovered) {
+    doorUnlocked = true;
+    doorMessage = "Door Unlocked!";
+    doorMessageTimeout = frameCount;
+  }
+}
+
+function checkDoorInteraction() {
+  // Check if player is touching door (last box is the door)
+  let door = boxes[2];
+  let nearDoor = collideRectRect(
+    mousePlayer.x,
+    mousePlayer.y,
+    mousePlayer.width,
+    mousePlayer.height,
+    door.x,
+    door.y,
+    door.width,
+    door.height
+  );
+
+  if (nearDoor) {
+    if (!doorUnlocked) {
+      doorMessage = "Locked";
+      doorMessageTimeout = frameCount;
+    } else {
+      // Handle door opening/level completion here
+      // For example: currentLevel++; setupLevel();
+      doorMessage = "Enter to proceed";
+      doorMessageTimeout = frameCount;
+
+      // Example of handling level completion (you'll need to implement your own logic)
+      if (keyIsPressed && key === "e") {
+        // Proceed to next level
+        console.log("Level completed!");
+      }
+    }
+  }
+}
+
+// Helper function for rectangle collision
+function collideRectRect(x1, y1, w1, h1, x2, y2, w2, h2) {
+  return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
+}
 function updateCursor() {
   if (overButton || (showModal && dist(mouseX, mouseY, 770, 220) < 15)) {
     cursor(HAND);
