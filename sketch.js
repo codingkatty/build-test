@@ -245,7 +245,6 @@ function draw() {
   } else if (gameState === "correct") {
     correct();
   } else if (gameState === "level2") {
-    drawLevel2();
   } else if (gameState === "gameover") {
     background(0, 0, 0);
   }
