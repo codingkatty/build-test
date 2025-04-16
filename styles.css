@@ -55,9 +55,9 @@ main #intro {
 }
 
 #intro-c img {
-    width: 80%;
-    max-width: 500px;
+    width: 600px;
     height: auto;
+    border-radius: 20px;
 }
 
 button {
@@ -80,6 +80,42 @@ button:active {
 
 button:hover {
     background-color: rgb(25, 99, 168);
+}
+
+.gallery {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 80px;
+    padding: 40px;
+    background: linear-gradient(to bottom, #f5f7ff, #e6eeff);
+    min-height: 600px;
+    position: relative;
+}
+
+.gallery img {
+    width: 400px;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    filter: brightness(0.95);
+}
+
+.gallery img:hover {
+    transform: scale(1.15) translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+    z-index: 1;
+    filter: brightness(1.05);
+}
+
+#Gallery h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 3em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 video {
