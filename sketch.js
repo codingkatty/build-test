@@ -35,7 +35,7 @@ let timerPaused = false;
 let lastTime = 0;
 
 let boxes = [];
-let bgm;
+let bgm, oof;
 
 function preload() {
   pixel1 = loadFont("../fonts/alagard.ttf");
@@ -63,6 +63,8 @@ function preload() {
 
   bgm = loadSound("../assets/scary_song.mp3");
   bgm.setVolume(0.4);
+
+  oof = loadSound("../assets/oof.mp3");
 }
 
 class Player {
@@ -247,6 +249,10 @@ function draw() {
   } else if (gameState === "level2") {
   } else if (gameState === "gameover") {
     background(0, 0, 0);
+    fill(255);
+    textSize(30);
+    textAlign(CENTER);
+    text("(you died)", width / 2, height / 2);
   }
 
   if (showModal) {
@@ -300,6 +306,7 @@ function updateTimer() {
       // Handle time's up event
       console.log("Time's up!");
       gameState = "gameover";
+      oof.play();
     }
   }
 }
@@ -775,6 +782,7 @@ function drawLevel1Door() {
       } else if (keyIsDown(69)) {
         console.log("lose");
         gameState = "gameover";
+        oof.play();
       }
     }
   }
@@ -881,7 +889,7 @@ function checkButtonInteractions() {
     mouseHole[2],
     mouseHole[3]
   );
-  if (mouseHoleDetect) {
+  if (mouseHoleDetect && !doorUnlocked) {
     console.log("mouse hole!!");
     gameState = "level1door";
     boxes = [];
