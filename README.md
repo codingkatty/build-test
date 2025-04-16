@@ -2,11 +2,13 @@
 
 disclaimer: clickbait
 
-an escape room game, we'll continue to create more levels!
+an escape room game, we'll continue to create more levels! (2 levels so far)
 
 ## Showcase
 
-add images here <3
+<img src="assets/img 1.png"/>
+<img src="assets/img 2.png"/>
+<img src="assets/img 3.png"/>
 
 ## Credits
 
