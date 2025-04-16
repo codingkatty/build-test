@@ -656,20 +656,19 @@ function setupLevel1() {
 
   // Ground
   boxes.push(new boxItem(0, height - 20, width, 30, color(100, 50, 50)));
-  // pressure plate activated blocker
+
   mouseBlockIndex = boxes.length;
   mouseBlock = new boxItem(0, 520, 150, 100, color(0, 180, 0));
   boxes.push(mouseBlock);
 
-  // Button positions (relative to your level design)
   buttonW = 80;
   buttonH = 30;
-  buttonX = 250; // On the main platform
+  buttonX = 250;
   buttonY = height - 200 - buttonH - 10;
 
   newButtonW = 80;
   newButtonH = 30;
-  newButtonX = width - 100; // Near the door
+  newButtonX = width - 100;
   newButtonY = height - 200 - newButtonH - 60;
 
   console.log(boxes);
@@ -1073,9 +1072,9 @@ function setupLevel2() {
     canVisible: true,
     can: {
       x: width / 2,
-      y: height - 175,
-      width: 50,
-      height: 80,
+      y: height - 200,
+      width: 80,
+      height: 120,
       color: color(200, 50, 50),
     },
     button: {
@@ -1098,14 +1097,14 @@ function setupLevel2() {
     },
     exit: {
       x: width - 100,
-      y: height - 160,
+      y: height - 200,
       width: 60,
-      height: 80,
+      height: 120,
       color: color(100, 100, 100),
     },
     lever: {
       x: width - 150,
-      y: height - 90,
+      y: height - 100,
       width: 20,
       height: 10,
       activated: false,
