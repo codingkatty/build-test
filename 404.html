@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>404 Not Found</title>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="icon" href="assets/favicon.svg">
-</head>
-<body>
-  <main>
-    <section id="intro">
-      <h1>uh oh, its an 404 page!</h1>
-      <p>please contact candy or violetz if you think something is drong D:</p>
+  <head>
+    <title>404 Not Found</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" href="assets/favicon.svg" />
+  </head>
+  <body>
+    <main>
+      <section id="intro">
+        <h1>uh oh, its an 404 page!</h1>
+        <p>
+          please contact candy or violetz if you think something is wrong D:
+        </p>
 
-      <br><br>
+        <br /><br />
 
-      <button onclick="
+        <button
+          onclick="
         fetch('/')
           .then(response => {
             if (response.ok) {
@@ -28,8 +31,11 @@
         .catch(() => {
           window.location.href = 'index.html';
         })
-      ">Take me back!!</button>
-    </section>
-  </main>
-</body>
+      "
+        >
+          Take me back!!
+        </button>
+      </section>
+    </main>
+  </body>
 </html>

@@ -247,9 +247,7 @@ function draw() {
   } else if (gameState === "correct") {
     correct();
   } else if (gameState === "level2") {
-    fill(0)
-    textSize(50);
-    text("Level 2", width / 2, height / 2);
+    drawLevel2();
   } else if (gameState === "gameover") {
     background(0, 0, 0);
     fill(255);
@@ -314,7 +312,7 @@ function updateTimer() {
   }
 }
 
-function drawTimer(c=0) {
+function drawTimer(c = 0) {
   // Draw timer UI
   push();
   fill(c);
@@ -608,14 +606,14 @@ let mouseHole = [30, 555, 100, 300];
 // doors data
 let doorsRiddle = [
   { x: 200, y: 200, w: 150, h: 200, c: [204, 51, 0] },
-  { x: 525, y: 200, w: 150, h: 200, c: [0, 204, 180] }, 
+  { x: 525, y: 200, w: 150, h: 200, c: [0, 204, 180] },
   { x: 850, y: 200, w: 150, h: 200, c: [102, 0, 255] },
-]
+];
 let riddles = [
   "The second letter of the alphabet,\nand a very long stick.\nIts rather twisted;\nthough it closes up.",
   "Maybe the sky,\nor maybe the sea.\nWhat I see?\nthe sacred color of mice.",
-  "Heartbroken,\nflooded in tears of blood.\nRoses aren't red;\nso aren't violets..."
-]
+  "Heartbroken,\nflooded in tears of blood.\nRoses aren't red;\nso aren't violets...",
+];
 let randomR = Math.floor(Math.random() * 3);
 let hinttxt = "are mice colorblind??";
 
@@ -623,11 +621,13 @@ function setupLevel1() {
   boxes = [];
 
   // Platforms and walls
-  boxes.push(new boxItem(300, height - 200, 200, 30, color(100, 70, 50))); // Main platform
+  boxes.push(new boxItem(200, height - 200, 200, 30, color(100, 70, 50))); // Main platform
   boxes.push(new boxItem(600, height - 300, 200, 30, color(100, 70, 50))); // Higher platform
 
   if (!doorUnlocked) {
-    boxes.push(new boxItem(width - 50, height - 200, 50, 200, color(160, 82, 45)));
+    boxes.push(
+      new boxItem(width - 50, height - 200, 50, 200, color(160, 82, 45))
+    );
   }
 
   // Ground
@@ -640,7 +640,7 @@ function setupLevel1() {
   // Button positions (relative to your level design)
   buttonW = 80;
   buttonH = 30;
-  buttonX = 350; // On the main platform
+  buttonX = 250; // On the main platform
   buttonY = height - 200 - buttonH - 10;
 
   newButtonW = 80;
@@ -697,7 +697,6 @@ function drawLevel1() {
 
     birdPlayer.show();
     birdPlayer.move(boxes);
-
   } else {
     fill(0);
     textSize(50);
@@ -711,16 +710,22 @@ function drawLevel1Door() {
   drawTimer(color(255, 255, 255));
 
   for (let door of doorsRiddle) {
-    if (collideRectRect(
-      mousePlayer.x,
-      mousePlayer.y,
-      mousePlayer.width,
-      mousePlayer.height,
-      door.x,
-      door.y,
-      door.w,
-      door.h
-    )) { stroke(255, 215, 0); } else { stroke(0); }
+    if (
+      collideRectRect(
+        mousePlayer.x,
+        mousePlayer.y,
+        mousePlayer.width,
+        mousePlayer.height,
+        door.x,
+        door.y,
+        door.w,
+        door.h
+      )
+    ) {
+      stroke(255, 215, 0);
+    } else {
+      stroke(0);
+    }
     strokeWeight(5);
     fill(door.c[0], door.c[1], door.c[2]);
     rect(door.x, door.y, door.w, door.h);
@@ -734,8 +739,12 @@ function drawLevel1Door() {
   textSize(30);
   fill(255);
   textAlign(CENTER);
-  text("You find yourself in front of 3 doors...\nTwo would lead to your doom. Choose wisely. (press 'e')", width / 2, 100);
-  
+  text(
+    "You find yourself in front of 3 doors...\nTwo would lead to your doom. Choose wisely. (press 'e')",
+    width / 2,
+    100
+  );
+
   textAlign(LEFT);
   text(riddles[randomR], 30, 500);
   mousePlayer.show();
@@ -744,30 +753,35 @@ function drawLevel1Door() {
   // door collide
   for (let i = 0; i < doorsRiddle.length; i++) {
     let door = doorsRiddle[i];
-    if (collideRectRect(
-      mousePlayer.x,
-      mousePlayer.y,
-      mousePlayer.width,
-      mousePlayer.height,
-      door.x,
-      door.y,
-      door.w,
-      door.h
-    )) {
-      if (collideRectRect(
+    if (
+      collideRectRect(
         mousePlayer.x,
         mousePlayer.y,
         mousePlayer.width,
         mousePlayer.height,
-        doorsRiddle[2].x,
-        doorsRiddle[2].y,
-        doorsRiddle[2].w,
-        doorsRiddle[2].h
-      ) && keyIsDown(69)) {
-        console.log("win")
-        gameState = "correct"
+        door.x,
+        door.y,
+        door.w,
+        door.h
+      )
+    ) {
+      if (
+        collideRectRect(
+          mousePlayer.x,
+          mousePlayer.y,
+          mousePlayer.width,
+          mousePlayer.height,
+          doorsRiddle[2].x,
+          doorsRiddle[2].y,
+          doorsRiddle[2].w,
+          doorsRiddle[2].h
+        ) &&
+        keyIsDown(69)
+      ) {
+        console.log("win");
+        gameState = "correct";
       } else if (keyIsDown(69)) {
-        console.log("lose")
+        console.log("lose");
         gameState = "gameover";
         oof.play();
       }
@@ -775,7 +789,7 @@ function drawLevel1Door() {
   }
 }
 
-let texty = 500
+let texty = 500;
 function correct() {
   background(0, 30, 0);
   fill(255);
@@ -838,9 +852,9 @@ function checkButtonInteractions() {
       buttonActivated = false;
     }
   }
-    //newButtonActivated = true;
-  
-/*
+  //newButtonActivated = true;
+
+  /*
   // Second button hover check (only if active)
   if (newButtonActivated) {
     newButtonHovered =
@@ -908,11 +922,11 @@ function drawSecondButton() {
   }
 }*/
 
-function drawMouseHole () {
+function drawMouseHole() {
   fill(0, 0, 0);
   noStroke();
   rect(mouseHole[0], mouseHole[1], mouseHole[2], mouseHole[3]);
-  circle(mouseHole[0] + mouseHole[2] /2, mouseHole[1], mouseHole[2]);
+  circle(mouseHole[0] + mouseHole[2] / 2, mouseHole[1], mouseHole[2]);
 }
 
 // Helper function for rectangle collision
@@ -1014,3 +1028,367 @@ class boxItem {
     rect(this.x, this.y, this.w, this.h); // Removed rounded corners for better collision
   }
 }
+
+function setupLevel2() {}
+
+function drawLevel2() {}
+
+/*P5.js code for level 2
+let ballReleased = false;
+let levelComplete = false;
+let leverActivated = false;
+let canVisible = true;
+
+function setup() {
+  createCanvas(800, 600);
+  
+  // Create game objects
+  mouse = {
+    x: 100,
+    y: 500,
+    width: 20,
+    height: 15,
+    speed: 4,
+    color: color(150, 150, 150)
+  };
+  
+  bird = {
+    x: 50,
+    y: 500,
+    width: 25,
+    height: 20,
+    speed: 5,
+    color: color(255, 200, 0)
+  };
+  
+  can = {
+    x: 400,
+    y: 500,
+    width: 50,
+    height: 80,
+    color: color(200, 50, 50)
+  };
+  
+  button = {
+    x: 600,
+    y: 200,
+    width: 40,
+    height: 10,
+    pressed: false,
+    color: color(255, 0, 0)
+  };
+  
+  ball = {
+    x: 620,
+    y: 150,
+    radius: 15,
+    released: false,
+    ySpeed: 0,
+    xSpeed: 0,
+    gravity: 0.5,
+    color: color(50, 50, 200),
+    grounded: false
+  };
+  
+  exit = {
+    x: 700,
+    y: 440,
+    width: 60,
+    height: 80,
+    color: color(100, 100, 100)
+  };
+  
+  lever = {
+    x: 650,
+    y: 510,
+    width: 20,
+    height: 10,
+    activated: false,
+    color: color(200, 200, 0)
+  };
+}
+
+function draw() {
+  background(220);
+  
+  // Draw ground
+  fill(100, 70, 50);
+  rect(0, 520, width, 80);
+  
+  // Draw platform for button
+  fill(100, 70, 50);
+  rect(550, 200, 150, 20);
+  
+  // Draw exit door
+  fill(exit.color);
+  rect(exit.x, exit.y, exit.width, exit.height);
+  
+  if (leverActivated) {
+    // Draw open door
+    fill(0, 200, 0);
+    rect(exit.x + 5, exit.y + 5, exit.width - 10, exit.height - 10);
+    text("EXIT OPEN", exit.x + 5, exit.y + 30);
+  } else {
+    // Draw closed door
+    line(exit.x + 10, exit.y + 10, exit.x + exit.width - 10, exit.y + exit.height - 10);
+    line(exit.x + exit.width - 10, exit.y + 10, exit.x + 10, exit.y + exit.height - 10);
+    text("LOCKED", exit.x + 12, exit.y + 30);
+  }
+  
+  // Draw lever in front of the door
+  fill(lever.color);
+  rect(lever.x, lever.y, lever.width, lever.height);
+  // Draw lever base
+  fill(100);
+  rect(lever.x - 2, lever.y + lever.height, lever.width + 4, 5);
+  
+  // Draw can - only if it's still visible
+  if (canVisible) {
+    fill(can.color);
+    rect(can.x, can.y, can.width, can.height, 5);
+    // Can details
+    fill(180);
+    rect(can.x + 5, can.y + 10, can.width - 10, 5);
+    rect(can.x + 5, can.y + 30, can.width - 10, 5);
+    rect(can.x + 5, can.y + 50, can.width - 10, 5);
+  }
+  
+  // Draw button
+  fill(button.pressed ? color(150, 0, 0) : button.color);
+  rect(button.x, button.y, button.width, button.height);
+  
+  // Draw ball
+  if (button.pressed || ball.released) {
+    fill(ball.color);
+    circle(ball.x, ball.y, ball.radius * 2);
+  }
+  
+  // Draw characters
+  drawCharacter(mouse, "MOUSE");
+  drawCharacter(bird, "BIRD");
+  
+  // Highlight active character
+  if (activeCharacter === "mouse") {
+    stroke(255, 255, 0);
+    strokeWeight(3);
+    noFill();
+    rect(mouse.x - 2, mouse.y - 2, mouse.width + 4, mouse.height + 4);
+    noStroke();
+  } else {
+    stroke(255, 255, 0);
+    strokeWeight(3);
+    noFill();
+    rect(bird.x - 2, bird.y - 2, bird.width + 4, bird.height + 4);
+    noStroke();
+  }
+  strokeWeight(1);
+  
+  // Game instructions
+  fill(0);
+  textSize(16);
+  text("Press SPACE to switch between Mouse and Bird", 20, 30);
+  text("Use arrow keys to move", 20, 55);
+  textSize(14);
+  
+  if (activeCharacter === "mouse") {
+    text("Active: MOUSE - Can activate the lever but can't reach the button", 20, 80);
+  } else {
+    text("Active: BIRD - Can fly to press the button but can't activate the lever", 20, 80);
+  }
+  
+  // Check button press
+  if (collides(bird, button) && activeCharacter === "bird") {
+    button.pressed = true;
+    if (!ball.released) {
+      ball.released = true;
+    }
+  }
+  
+  // Ball physics
+  if (ball.released) {
+    // Apply gravity to vertical speed
+    ball.ySpeed += ball.gravity;
+    ball.y += ball.ySpeed;
+    
+    // Apply horizontal movement if the ball is rolling
+    ball.x += ball.xSpeed;
+    
+    // Check if ball hits the ground
+    if (ball.y + ball.radius >= 520) {
+      ball.y = 520 - ball.radius;
+      
+      if (!ball.grounded) {
+        // First time hitting ground
+        ball.ySpeed = 0;
+        ball.xSpeed = -4; // Start rolling left toward the can
+        ball.grounded = true;
+      } else {
+        // Already grounded - apply friction
+        ball.xSpeed *= 0.99;
+      }
+    }
+    
+    // Check if ball hits the can
+    if (canVisible && circleRectCollision(ball, can)) {
+      // Make the can disappear
+      canVisible = false;
+      
+      // Ball bounces slightly
+      ball.xSpeed *= -0.5;
+      
+      // Add a small visual effect (particle would be better but keeping it simple)
+      fill(255, 200, 0, 150);
+      circle(can.x + can.width/2, can.y + can.height/2, 80);
+    }
+  }
+  
+  // Check if mouse can activate lever
+  // Only allow mouse to activate lever if can is removed
+  if (activeCharacter === "mouse" && 
+      collides(mouse, lever) && 
+      !leverActivated &&
+      !canVisible) { // Can must be gone
+    if (keyIsDown(UP_ARROW)) {
+      leverActivated = true;
+      lever.color = color(0, 255, 0);
+    }
+  }
+  
+  // Show lever activation hint
+  if (activeCharacter === "mouse" && 
+      collides(mouse, lever) && 
+      !leverActivated &&
+      !canVisible) {
+    fill(0);
+    text("Press UP ARROW to activate lever", lever.x - 60, lever.y - 10);
+  }
+  
+  // Check win condition
+  if (leverActivated && 
+      ((activeCharacter === "mouse" && collides(mouse, exit)) || 
+       (activeCharacter === "bird" && collides(bird, exit)))) {
+    levelComplete = true;
+  }
+  
+  // Display win message
+  if (levelComplete) {
+    fill(0, 100, 0);
+    textSize(32);
+    text("Level Complete!", width/2 - 120, height/2);
+    textSize(18);
+    text("Mouse and Bird worked together to solve the puzzle!", width/2 - 170, height/2 + 40);
+  }
+  
+  // Display can blocking message
+  if (canVisible && mouse.x > 300 && mouse.x < can.x && activeCharacter === "mouse") {
+    fill(200, 0, 0);
+    text("The can is too heavy for the mouse to push!", can.x - 50, can.y - 20);
+  }
+  
+  // Handle movement input
+  handleMovement();
+}
+
+function handleMovement() {
+  let character = activeCharacter === "mouse" ? mouse : bird;
+  
+  if (keyIsDown(LEFT_ARROW)) {
+    character.x -= character.speed;
+    
+    // Mouse can't push the can
+    if (activeCharacter === "mouse" && canVisible && collides(mouse, can)) {
+      mouse.x = can.x - mouse.width;
+    }
+  }
+  
+  if (keyIsDown(RIGHT_ARROW)) {
+    character.x += character.speed;
+    
+    // Mouse can't push the can
+    if (activeCharacter === "mouse" && canVisible && collides(mouse, can)) {
+      mouse.x = can.x + can.width;
+    }
+  }
+  
+  // Bird can fly, mouse can't
+  if (activeCharacter === "bird") {
+    if (keyIsDown(UP_ARROW)) {
+      bird.y -= bird.speed;
+    }
+    if (keyIsDown(DOWN_ARROW)) {
+      bird.y += bird.speed;
+    }
+  } else {
+    // Mouse can only move on ground
+    mouse.y = 500;
+  }
+  
+  // Keep characters within bounds
+  character.x = constrain(character.x, 0, width - character.width);
+  character.y = constrain(character.y, 0, 500);
+}
+
+function keyPressed() {
+  if (key === ' ') {
+    // Switch active character
+    activeCharacter = activeCharacter === "mouse" ? "bird" : "mouse";
+  }
+}
+
+function drawCharacter(character, name) {
+  fill(character.color);
+  rect(character.x, character.y, character.width, character.height, 5);
+  
+  // Add character details
+  if (name === "MOUSE") {
+    // Ears
+    fill(180, 180, 180);
+    circle(character.x + 5, character.y, 6);
+    circle(character.x + character.width - 5, character.y, 6);
+    
+    // Eyes
+    fill(0);
+    circle(character.x + 5, character.y + 5, 3);
+    circle(character.x + character.width - 5, character.y + 5, 3);
+    
+    // Tail
+    stroke(150);
+    line(character.x - 10, character.y + 10, character.x, character.y + 8);
+    noStroke();
+  } else {
+    // Bird details
+    fill(255, 150, 0);
+    triangle(character.x + character.width - 2, character.y + 5, 
+             character.x + character.width + 8, character.y + 8, 
+             character.x + character.width - 2, character.y + 10);
+    
+    // Eyes
+    fill(0);
+    circle(character.x + character.width - 6, character.y + 6, 3);
+    
+    // Wings
+    fill(220, 180, 0);
+    ellipse(character.x + 10, character.y + 10, 15, 8);
+  }
+}
+
+function collides(obj1, obj2) {
+  return obj1.x < obj2.x + obj2.width &&
+         obj1.x + obj1.width > obj2.x &&
+         obj1.y < obj2.y + obj2.height &&
+         obj1.y + obj1.height > obj2.y;
+}
+
+function circleRectCollision(circle, rect) {
+  // Find the closest point on the rectangle to the circle
+  let closestX = constrain(circle.x, rect.x, rect.x + rect.width);
+  let closestY = constrain(circle.y, rect.y, rect.y + rect.height);
+  
+  // Calculate the distance between the circle's center and the closest point
+  let distanceX = circle.x - closestX;
+  let distanceY = circle.y - closestY;
+  
+  // If the distance is less than the circle's radius, there's a collision
+  return (distanceX * distanceX + distanceY * distanceY) < (circle.radius * circle.radius);
+}
+*/
