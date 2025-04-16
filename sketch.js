@@ -395,6 +395,7 @@ function drawMenu() {
   text("Game Rules", 630 + 125, 450);
 }
 
+let cat_frame = 1;
 function drawStory() {
   background(100, 0, 0);
   if (animationProgress < 100) {
@@ -430,9 +431,17 @@ function drawStory() {
 
     background(255);
 
+    image(window[`cat_walk${cat_frame}`], anim_catX, 280, 220, 200);
+
     if (frameCounter < 1) {
       image(mouse_run1, anim_mouseX, 400, 96, 72);
       image(bird_fly1, anim_birdX, 200, 120, 120);
+      if (frameCount % 3 === 0) {
+        cat_frame++;
+        if (cat_frame > 6) {
+          cat_frame = 1;
+        }
+      }
     } else {
       image(mouse_run2, anim_mouseX, 400, 96, 72);
       image(bird_fly2, anim_birdX, 200, 120, 120);
@@ -679,8 +688,16 @@ function drawLevel1() {
       textSize(30);
       text("Level 2 ->", width - 100, 300);
       if (mousePlayer.x > width && birdPlayer.x > width) {
+        console.log("Starting level 2");
         gameState = "level2";
         doorUnlocked = false;
+        counter = 0;
+        if (mousePlayer.x > width && birdPlayer.x > width) {
+          console.log("Transitioning to level 2");
+          gameState = "level2";
+          counter = 0; // Reset counter for level 2 setup
+          doorUnlocked = false;
+        }
       }
     }
 
@@ -1044,6 +1061,141 @@ class boxItem {
   }
 }
 
-function setupLevel2() {}
+function setupLevel2() {
+  boxes = [];
 
-function drawLevel2() {}
+  boxes.push(new boxItem(0, height - 80, width, 80, color(100, 70, 50)));
+
+  level2Objects = {
+    ballReleased: false,
+    levelComplete: false,
+    leverActivated: false,
+    canVisible: true,
+    can: {
+      x: width / 2,
+      y: height - 175,
+      width: 50,
+      height: 80,
+      color: color(200, 50, 50),
+    },
+    button: {
+      x: width - 400,
+      y: 200,
+      width: 40,
+      height: 10,
+      pressed: false,
+      color: color(255, 0, 0),
+    },
+    ball: {
+      x: width - 380,
+      y: 150,
+      radius: 15,
+      released: false,
+      ySpeed: 0,
+      xSpeed: 0,
+      gravity: 0.5,
+      color: color(50, 50, 200),
+    },
+    exit: {
+      x: width - 100,
+      y: height - 160,
+      width: 60,
+      height: 80,
+      color: color(100, 100, 100),
+    },
+    lever: {
+      x: width - 150,
+      y: height - 90,
+      width: 20,
+      height: 10,
+      activated: false,
+      color: color(200, 200, 0),
+    },
+  };
+
+  // Reset player positions
+  mousePlayer.x = 100;
+  mousePlayer.y = height - 200;
+  birdPlayer.x = 100;
+  birdPlayer.y = height - 300;
+}
+
+function drawLevel2() {
+  if (counter === 100) {
+    setupLevel2();
+    resetTimer();
+    startTimer();
+  }
+
+  if (counter > 100) {
+    background(230, 238, 255);
+
+    // Draw boxes
+    for (let box of boxes) {
+      box.show();
+    }
+
+    if (level2Objects.canVisible) {
+      fill(level2Objects.can.color);
+      rect(
+        level2Objects.can.x,
+        height - level2Objects.can.height - 100,
+        level2Objects.can.width,
+        level2Objects.can.height + 30
+      );
+    }
+
+    fill(
+      level2Objects.button.pressed
+        ? color(150, 0, 0)
+        : level2Objects.button.color
+    );
+    rect(
+      level2Objects.button.x,
+      level2Objects.button.y,
+      level2Objects.button.width * 2,
+      level2Objects.button.height * 2
+    );
+
+    if (level2Objects.ballReleased) {
+      fill(level2Objects.ball.color);
+      circle(
+        level2Objects.ball.x,
+        level2Objects.ball.y,
+        level2Objects.ball.radius * 2
+      );
+    }
+
+    fill(
+      level2Objects.leverActivated
+        ? color(0, 255, 0)
+        : level2Objects.lever.color
+    );
+    rect(
+      level2Objects.lever.x,
+      level2Objects.lever.y,
+      level2Objects.lever.width * 2,
+      level2Objects.lever.height * 2
+    );
+
+    fill(level2Objects.exit.color);
+    rect(
+      level2Objects.exit.x,
+      level2Objects.exit.y,
+      level2Objects.exit.width * 1.5,
+      level2Objects.exit.height * 1.5
+    );
+
+    mousePlayer.show();
+    mousePlayer.move(boxes);
+    birdPlayer.show();
+    birdPlayer.move(boxes);
+
+    updateTimer();
+    drawTimer();
+  } else {
+    fill(0);
+    textSize(50);
+    text("Level 2", width / 2, height / 2);
+  }
+}
