@@ -645,8 +645,8 @@ function setupLevel1() {
   boxes = [];
 
   // Platforms and walls
-  boxes.push(new boxItem(200, height - 200, 200, 30, color(100, 70, 50))); // Main platform
-  boxes.push(new boxItem(600, height - 300, 200, 30, color(100, 70, 50))); // Higher platform
+  boxes.push(new boxItem(200, height - 200, 200, 30, color(100, 70, 50)));
+  boxes.push(new boxItem(600, height - 300, 200, 30, color(100, 70, 50)));
 
   if (!doorUnlocked) {
     boxes.push(
@@ -931,9 +931,9 @@ function checkButtonInteractions() {
 
 function drawFirstButton() {
   if (buttonHovered && !buttonActivated)
-    fill(255, 182, 193); // Light pink when hovering
-  else if (buttonActivated) fill(139, 0, 0); // Dark red when activated
-  else fill(255, 0, 0); // Red when idle
+    fill(255, 182, 193); 
+  else if (buttonActivated) fill(139, 0, 0);
+  else fill(255, 0, 0);
   noStroke();
   rect(buttonX, buttonY, buttonW, buttonH);
 }
@@ -972,6 +972,7 @@ function collideRectRect(x1, y1, w1, h1, x2, y2, w2, h2) {
 
   return collision;
 }
+
 function updateCursor() {
   if (overButton || (showModal && dist(mouseX, mouseY, 770, 220) < 15)) {
     cursor(HAND);
@@ -1056,48 +1057,49 @@ class boxItem {
     fill(this.color);
     stroke(0);
     strokeWeight(2);
-    rect(this.x, this.y, this.w, this.h); // Removed rounded corners for better collision
+    rect(this.x, this.y, this.w, this.h);
   }
 }
 
 function setupLevel2() {
   boxes = [];
 
+  // Floor
   boxes.push(new boxItem(0, height - 80, width, 80, color(100, 70, 50)));
 
+  // Last platform
+  boxes.push(new boxItem(800, height - 320, 200, 30, color(100, 70, 50)));
+
+  // The can as a solid red box
+  let canBox = new boxItem(width / 2, height - 200, 80, 120, color(200, 50, 50));
+  boxes.push(canBox);
+
+  // Define level objects
   level2Objects = {
     ballReleased: false,
     levelComplete: false,
     leverActivated: false,
-    canVisible: true,
-    can: {
-      x: width / 2,
-      y: height - 200,
-      width: 80,
-      height: 120,
-      color: color(200, 50, 50),
-    },
     button: {
-      x: width - 400,
-      y: 200,
+      x: 870,
+      y: height - 330,
       width: 40,
       height: 10,
       pressed: false,
       color: color(255, 0, 0),
     },
     ball: {
-      x: width - 380,
-      y: 150,
+      x: -100,
+      y: -100,
       radius: 15,
       released: false,
       ySpeed: 0,
-      xSpeed: 0,
+      xSpeed: 2,
       gravity: 0.5,
       color: color(50, 50, 200),
     },
     exit: {
       x: width - 100,
-      y: height - 200,
+      y: height - 260,
       width: 60,
       height: 120,
       color: color(100, 100, 100),
@@ -1112,11 +1114,16 @@ function setupLevel2() {
     },
   };
 
-  // Reset player positions
+  // Player starting positions
   mousePlayer.x = 100;
-  mousePlayer.y = height - 200;
+  mousePlayer.y = height - 250;
   birdPlayer.x = 100;
-  birdPlayer.y = height - 300;
+  birdPlayer.y = height - 350;
+
+  mousePlayer.show();
+  mousePlayer.move(boxes);
+  birdPlayer.show();
+  birdPlayer.move(boxes);
 }
 
 function drawLevel2() {
@@ -1129,21 +1136,14 @@ function drawLevel2() {
   if (counter > 100) {
     background(230, 238, 255);
 
-    // Draw boxes
+    // Draw platforms
     for (let box of boxes) {
       box.show();
     }
 
-    if (level2Objects.canVisible) {
-      fill(level2Objects.can.color);
-      rect(
-        level2Objects.can.x,
-        height - level2Objects.can.height - 100,
-        level2Objects.can.width,
-        level2Objects.can.height + 30
-      );
-    }
+    checkPlayerButtonCollision(); // Check for player standing on button
 
+    // Draw the button
     fill(
       level2Objects.button.pressed
         ? color(150, 0, 0)
@@ -1156,6 +1156,7 @@ function drawLevel2() {
       level2Objects.button.height * 2
     );
 
+    // Draw and move the ball
     if (level2Objects.ballReleased) {
       fill(level2Objects.ball.color);
       circle(
@@ -1163,20 +1164,10 @@ function drawLevel2() {
         level2Objects.ball.y,
         level2Objects.ball.radius * 2
       );
+      moveBall();
     }
 
-    fill(
-      level2Objects.leverActivated
-        ? color(0, 255, 0)
-        : level2Objects.lever.color
-    );
-    rect(
-      level2Objects.lever.x,
-      level2Objects.lever.y,
-      level2Objects.lever.width * 2,
-      level2Objects.lever.height * 2
-    );
-
+    // Draw exit
     fill(level2Objects.exit.color);
     rect(
       level2Objects.exit.x,
@@ -1185,10 +1176,14 @@ function drawLevel2() {
       level2Objects.exit.height * 1.5
     );
 
+    // Show and move players
     mousePlayer.show();
     mousePlayer.move(boxes);
+    checkCollision(mousePlayer);
+
     birdPlayer.show();
     birdPlayer.move(boxes);
+    checkCollision(birdPlayer);
 
     updateTimer();
     drawTimer();
@@ -1196,5 +1191,97 @@ function drawLevel2() {
     fill(0);
     textSize(50);
     text("Level 2", width / 2, height / 2);
+  }
+}
+
+function spawnBall() {
+  if (!level2Objects.ballReleased) {
+    level2Objects.ball.x = width - 380;
+    level2Objects.ball.y = 150;
+    level2Objects.ball.ySpeed = 0;
+    level2Objects.ballReleased = true;
+  }
+}
+
+function moveBall() {
+  // Gravity
+  level2Objects.ball.ySpeed += level2Objects.ball.gravity;
+  level2Objects.ball.y += level2Objects.ball.ySpeed;
+
+  // Rolling left
+  level2Objects.ball.x -= level2Objects.ball.xSpeed;
+
+  // Check collision with boxes
+  for (let box of boxes) {
+    let ball = level2Objects.ball;
+    if (
+      ball.x + ball.radius > box.x &&
+      ball.x - ball.radius < box.x + box.width &&
+      ball.y + ball.radius > box.y &&
+      ball.y - ball.radius < box.y + box.height
+    ) {
+      // Simple response: stop movement
+      ball.y = box.y - ball.radius;
+      ball.ySpeed = 0;
+
+      // If it hit the can box (centered), remove it
+      if (
+        Math.abs((box.x + box.width / 2) - (width / 2)) < 5 &&
+        Math.abs((box.y + box.height / 2) - (height - 200 + 60)) < 5
+      ) {
+        boxes = boxes.filter(b => b !== box); // Remove the can
+        level2Objects.ballReleased = false;
+      }
+    }
+  }
+}
+
+function checkPlayerButtonCollision() {
+  let players = [mousePlayer, birdPlayer];
+
+  for (let player of players) {
+    if (
+      player.x + player.width > level2Objects.button.x &&
+      player.x < level2Objects.button.x + level2Objects.button.width * 2 &&
+      player.y + player.height > level2Objects.button.y &&
+      player.y < level2Objects.button.y + level2Objects.button.height * 2
+    ) {
+      if (!level2Objects.button.pressed) {
+        level2Objects.button.pressed = true;
+        spawnBall();
+      }
+    }
+  }
+}
+
+function checkCollision(player) {
+  for (let box of boxes) {
+    resolveCollision(player, box);
+  }
+}
+
+function resolveCollision(player, obj) {
+  if (
+    player.x + player.width > obj.x &&
+    player.x < obj.x + obj.width &&
+    player.y + player.height > obj.y &&
+    player.y < obj.y + obj.height
+  ) {
+    let fromTop = player.y + player.height - player.ySpeed <= obj.y;
+    let fromBottom = player.y - player.ySpeed >= obj.y + obj.height;
+    let fromLeft = player.x + player.width - player.xSpeed <= obj.x;
+    let fromRight = player.x - player.xSpeed >= obj.x + obj.width;
+
+    if (fromTop) {
+      player.y = obj.y - player.height;
+      player.ySpeed = 0;
+    } else if (fromBottom) {
+      player.y = obj.y + obj.height;
+      player.ySpeed = 0;
+    } else if (fromLeft) {
+      player.x = obj.x - player.width;
+    } else if (fromRight) {
+      player.x = obj.x + obj.width;
+    }
   }
 }
