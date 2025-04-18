@@ -1088,14 +1088,15 @@ function setupLevel2() {
       color: color(255, 0, 0),
     },
     ball: {
-      x: -100,
-      y: -100,
+      x: 620,
+      y: 150,
       radius: 15,
       released: false,
       ySpeed: 0,
-      xSpeed: 2,
+      xSpeed: 0,
       gravity: 0.5,
       color: color(50, 50, 200),
+      grounded: false
     },
     exit: {
       x: width - 100,
@@ -1204,12 +1205,23 @@ function spawnBall() {
 }
 
 function moveBall() {
-  // Gravity
+  /* Gravity
   level2Objects.ball.ySpeed += level2Objects.ball.gravity;
   level2Objects.ball.y += level2Objects.ball.ySpeed;
 
   // Rolling left
   level2Objects.ball.x -= level2Objects.ball.xSpeed;
+  */
+
+  if (level2Objects.ball.y > 555) {
+    level2Objects.ball.x -= 5;
+  } else {
+    level2Objects.ball.y += 5;
+  }
+
+  console.log(level2Objects.ball.y);
+  
+  
 
   // Check collision with boxes
   for (let box of boxes) {
