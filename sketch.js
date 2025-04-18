@@ -931,7 +931,7 @@ function checkButtonInteractions() {
 
 function drawFirstButton() {
   if (buttonHovered && !buttonActivated)
-    fill(255, 182, 193); 
+    fill(255, 182, 193);
   else if (buttonActivated) fill(139, 0, 0);
   else fill(255, 0, 0);
   noStroke();
@@ -1061,6 +1061,10 @@ class boxItem {
   }
 }
 
+let canBoxIndex = -1;
+let ballTouching = false;
+let canBlock = null;
+
 function setupLevel2() {
   boxes = [];
 
@@ -1069,10 +1073,6 @@ function setupLevel2() {
 
   // Last platform
   boxes.push(new boxItem(800, height - 320, 200, 30, color(100, 70, 50)));
-
-  // The can as a solid red box
-  let canBox = new boxItem(width / 2, height - 200, 80, 120, color(200, 50, 50));
-  boxes.push(canBox);
 
   // Define level objects
   level2Objects = {
@@ -1114,6 +1114,11 @@ function setupLevel2() {
       color: color(200, 200, 0),
     },
   };
+
+  // Add initial green canBox
+  canBlock = new boxItem(30, height - 180, 150, 100, color(0, 180, 0));
+  boxes.push(canBlock);
+  canBoxIndex = boxes.length - 1;
 
   // Player starting positions
   mousePlayer.x = 100;
@@ -1205,45 +1210,46 @@ function spawnBall() {
 }
 
 function moveBall() {
-  /* Gravity
-  level2Objects.ball.ySpeed += level2Objects.ball.gravity;
-  level2Objects.ball.y += level2Objects.ball.ySpeed;
+  let ball = level2Objects.ball;
 
-  // Rolling left
-  level2Objects.ball.x -= level2Objects.ball.xSpeed;
-  */
+  // Apply gravity
+  ball.ySpeed += ball.gravity;
+  ball.y += ball.ySpeed;
+  ball.grounded = false;
 
-  if (level2Objects.ball.y > 555) {
-    level2Objects.ball.x -= 5;
-  } else {
-    level2Objects.ball.y += 5;
-  }
-
-  console.log(level2Objects.ball.y);
-  
-  
-
-  // Check collision with boxes
+  // Check for collisions with boxes
   for (let box of boxes) {
-    let ball = level2Objects.ball;
     if (
       ball.x + ball.radius > box.x &&
       ball.x - ball.radius < box.x + box.width &&
       ball.y + ball.radius > box.y &&
       ball.y - ball.radius < box.y + box.height
     ) {
-      // Simple response: stop movement
       ball.y = box.y - ball.radius;
       ball.ySpeed = 0;
+      ball.grounded = true;
+    }
+  }
 
-      // If it hit the can box (centered), remove it
-      if (
-        Math.abs((box.x + box.width / 2) - (width / 2)) < 5 &&
-        Math.abs((box.y + box.height / 2) - (height - 200 + 60)) < 5
-      ) {
-        boxes = boxes.filter(b => b !== box); // Remove the can
-        level2Objects.ballReleased = false;
-      }
+  // Move ball right if grounded
+  if (ball.grounded) {
+    ball.x += 2;
+  }
+
+  // Check collision with canBox
+  if (canBoxIndex >= 0 && canBoxIndex < boxes.length) {
+    let can = boxes[canBoxIndex];
+    if (
+      ball.x + ball.radius > can.x &&
+      ball.x - ball.radius < can.x + can.width &&
+      ball.y + ball.radius > can.y &&
+      ball.y - ball.radius < can.y + can.height
+    ) {
+      boxes.splice(canBoxIndex, 1);
+      let fakeBox = new boxItem(can.x, can.y, can.width, can.height, can.color);
+      fakeBox.passThrough = true;
+      boxes.push(fakeBox);
+      canBoxIndex = -1;
     }
   }
 }
@@ -1273,6 +1279,8 @@ function checkCollision(player) {
 }
 
 function resolveCollision(player, obj) {
+  if (obj.passThrough) return;
+
   if (
     player.x + player.width > obj.x &&
     player.x < obj.x + obj.width &&
