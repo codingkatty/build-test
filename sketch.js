@@ -1190,14 +1190,6 @@ function drawLevel2() {
           }
         }
       }
-
-      fill(0);
-      textSize(14);
-      text(`Ball State: ${level2Objects.ball ?
-        (level2Objects.ball.rolling ? "ROLLING" :
-          (level2Objects.ball.grounded ? "GROUNDED" : "FALLING")) : "NONE"}`, 20, 30);
-      text(`Position: ${level2Objects.ball ?
-        `${floor(level2Objects.ball.x)},${floor(level2Objects.ball.y)}` : "N/A"}`, 20, 50);
     }
 
     // NEW: Check if players exited (trigger new room)
@@ -1255,6 +1247,8 @@ function spawnBall() {
 }
 
 function moveBall() {
+  if (!level2Objects.ball || !level2Objects.ballReleased) return;
+
   let ball = level2Objects.ball;
 
   // Apply gravity if not grounded
@@ -1278,26 +1272,26 @@ function moveBall() {
   if (ball.rolling) {
     ball.x -= 4; // Roll left speed
 
-    // Check collision with red box (can)
-    if (canBoxIndex >= 0) {
-      let can = boxes[canBoxIndex];
-      // Precise collision check
-      if (dist(ball.x, ball.y, can.x + can.width / 2, can.y + can.height / 2) <
-        (ball.radius + max(can.width, can.height) / 2)) {
-
-        // Replace with non-physical block
-        let fakeBox = new boxItem(can.x, can.y, can.width, can.height, can.color);
-        fakeBox.passThrough = true;
+    if (ball.x <= 650 + 100 && ball.x >= 650) { // Can is at x=650, width=100
+      // Remove the physical can box
+      if (canBoxIndex >= 0 && canBoxIndex < boxes.length) {
         boxes.splice(canBoxIndex, 1);
-        boxes.push(fakeBox);
         canBoxIndex = -1;
-
-        // Remove ball
-        level2Objects.ballReleased = false;
-        level2Objects.ball = null;
       }
+
+      // Remove ball
+      level2Objects.ballReleased = false;
+      level2Objects.ball = null;
+
+      // Debug output
+      console.log("Box destroyed!");
     }
   }
+}
+
+// Helper function to constrain value
+function constrain(value, min, max) {
+  return value < min ? min : (value > max ? max : value);
 }
 
 // Add this helper function if not exists
