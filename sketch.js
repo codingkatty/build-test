@@ -7,9 +7,9 @@ let pixel1,
   cat_eyes2,
   cat_eyes3,
   cat_eyes4;
-let mouse_run1, mouse_run2, bird_fly1, bird_fly2, cat_chaser, mouse, bird;
+let mouse_run1, mouse_run2, bird_fly1, bird_fly2, cat_chaser, mouse, bird, colacan;
 
-let gameState = "menu";
+let gameState = "costume";
 let overButton = false;
 let showModal = false;
 
@@ -82,6 +82,7 @@ function preload() {
   bgm.setVolume(0.4);
 
   oof = loadSound("../assets/oof.mp3");
+  colacan = loadImage("../gameassets/colacan-side.png");
 }
 
 class Player {
@@ -1079,6 +1080,7 @@ function setupLevel2() {
     ballReleased: false,
     levelComplete: false,
     leverActivated: false,
+    newRoomSpawned: false, // NEW: Track if new room is spawned
     button: {
       x: 870,
       y: height - 330,
@@ -1086,17 +1088,6 @@ function setupLevel2() {
       height: 10,
       pressed: false,
       color: color(255, 0, 0),
-    },
-    ball: {
-      x: 620,
-      y: 150,
-      radius: 15,
-      released: false,
-      ySpeed: 0,
-      xSpeed: 0,
-      gravity: 0.5,
-      color: color(50, 50, 200),
-      grounded: false
     },
     exit: {
       x: width - 100,
@@ -1115,8 +1106,8 @@ function setupLevel2() {
     },
   };
 
-  // Add initial green canBox
-  canBlock = new boxItem(30, height - 180, 150, 100, color(0, 180, 0));
+  // Add initial red canBox
+  canBlock = new boxItem(650, height - 200, 100, 150, color(200, 0, 0));
   boxes.push(canBlock);
   canBoxIndex = boxes.length - 1;
 
@@ -1130,6 +1121,19 @@ function setupLevel2() {
   mousePlayer.move(boxes);
   birdPlayer.show();
   birdPlayer.move(boxes);
+
+  level2Objects.ball = {
+    x: 870, // Button x-position
+    y: height - 380, // Start above button (button is at height-330)
+    radius: 15,
+    released: false,
+    ySpeed: 0,
+    xSpeed: 0,
+    gravity: 0.3, // Reduced gravity for better feel
+    color: color(50, 50, 200),
+    grounded: false,
+    rolling: false
+  };
 }
 
 function drawLevel2() {
@@ -1147,40 +1151,61 @@ function drawLevel2() {
       box.show();
     }
 
+    image(colacan, 640, height - 220, 120, 180);
+
     checkPlayerButtonCollision(); // Check for player standing on button
 
     // Draw the button
-    fill(
-      level2Objects.button.pressed
-        ? color(150, 0, 0)
-        : level2Objects.button.color
-    );
-    rect(
-      level2Objects.button.x,
-      level2Objects.button.y,
-      level2Objects.button.width * 2,
-      level2Objects.button.height * 2
-    );
+    fill(level2Objects.button.pressed ? color(150, 0, 0) : level2Objects.button.color);
+    rect(level2Objects.button.x, level2Objects.button.y, level2Objects.button.width * 2, level2Objects.button.height * 2);
 
     // Draw and move the ball
     if (level2Objects.ballReleased) {
       fill(level2Objects.ball.color);
-      circle(
-        level2Objects.ball.x,
-        level2Objects.ball.y,
-        level2Objects.ball.radius * 2
-      );
+      circle(level2Objects.ball.x, level2Objects.ball.y, level2Objects.ball.radius * 2);
       moveBall();
     }
 
     // Draw exit
     fill(level2Objects.exit.color);
-    rect(
-      level2Objects.exit.x,
-      level2Objects.exit.y,
-      level2Objects.exit.width * 1.5,
-      level2Objects.exit.height * 1.5
-    );
+    rect(level2Objects.exit.x, level2Objects.exit.y, level2Objects.exit.width * 1.5, level2Objects.exit.height * 1.5);
+
+    // Draw lever
+    fill(level2Objects.lever.activated ? color(150, 150, 0) : level2Objects.lever.color);
+    rect(level2Objects.lever.x, level2Objects.lever.y, level2Objects.lever.width, level2Objects.lever.height);
+
+    // NEW: Check lever interaction (mouse-only)
+    if (mousePlayer.isInteracting && !level2Objects.lever.activated) {
+      if (
+        mousePlayer.x + mousePlayer.width > level2Objects.lever.x &&
+        mousePlayer.x < level2Objects.lever.x + level2Objects.lever.width &&
+        mousePlayer.y + mousePlayer.height > level2Objects.lever.y &&
+        mousePlayer.y < level2Objects.lever.y + level2Objects.lever.height
+      ) {
+        level2Objects.lever.activated = true;
+        // Make exit non-jumpable
+        for (let box of boxes) {
+          if (box.x === level2Objects.exit.x && box.y === level2Objects.exit.y) {
+            box.passThrough = true;
+          }
+        }
+      }
+
+      fill(0);
+      textSize(14);
+      text(`Ball State: ${level2Objects.ball ?
+        (level2Objects.ball.rolling ? "ROLLING" :
+          (level2Objects.ball.grounded ? "GROUNDED" : "FALLING")) : "NONE"}`, 20, 30);
+      text(`Position: ${level2Objects.ball ?
+        `${floor(level2Objects.ball.x)},${floor(level2Objects.ball.y)}` : "N/A"}`, 20, 50);
+    }
+
+    // NEW: Check if players exited (trigger new room)
+    if (!level2Objects.newRoomSpawned && mousePlayer.x > width && birdPlayer.x > width) {
+      level2Objects.newRoomSpawned = true;
+      // Spawn new room floor
+      boxes.push(new boxItem(0, height - 80, width, 80, color(100, 70, 50)));
+    }
 
     // Show and move players
     mousePlayer.show();
@@ -1198,77 +1223,108 @@ function drawLevel2() {
     textSize(50);
     text("Level 2", width / 2, height / 2);
   }
+
+  // In drawLevel2():
+  if (level2Objects.ballReleased && level2Objects.ball) {
+    fill(level2Objects.ball.color);
+    circle(
+      level2Objects.ball.x,
+      level2Objects.ball.y,
+      level2Objects.ball.radius * 2
+    );
+    moveBall(); // Update ball position
+  }
 }
 
 function spawnBall() {
-  if (!level2Objects.ballReleased) {
-    level2Objects.ball.x = width - 380;
-    level2Objects.ball.y = 150;
-    level2Objects.ball.ySpeed = 0;
-    level2Objects.ballReleased = true;
+  if (!level2Objects.ball || !level2Objects.ball.released) {
+    level2Objects.ball = {
+      x: level2Objects.button.x + level2Objects.button.width,
+      y: level2Objects.button.y - 50,
+      radius: 15,
+      released: true, // Mark as released immediately
+      ySpeed: 0,
+      xSpeed: 0,
+      gravity: 0.5,
+      color: color(50, 50, 200),
+      grounded: false,
+      rolling: false
+    };
+    level2Objects.ballReleased = true; // Ensure this flag is set
   }
 }
 
 function moveBall() {
   let ball = level2Objects.ball;
 
-  // Apply gravity
-  ball.ySpeed += ball.gravity;
-  ball.y += ball.ySpeed;
+  // Apply gravity if not grounded
+  if (!ball.grounded) {
+    ball.ySpeed += ball.gravity;
+    ball.y += ball.ySpeed;
+  }
+
+  // Reset collision state
   ball.grounded = false;
 
-  // Check for collisions with boxes
-  for (let box of boxes) {
-    if (
-      ball.x + ball.radius > box.x &&
-      ball.x - ball.radius < box.x + box.width &&
-      ball.y + ball.radius > box.y &&
-      ball.y - ball.radius < box.y + box.height
-    ) {
-      ball.y = box.y - ball.radius;
-      ball.ySpeed = 0;
-      ball.grounded = true;
-    }
+  // Check collision with floor (specific to your 675 height)
+  if (ball.y + ball.radius >= height - 80) { // Floor is at height-80
+    ball.y = height - 80 - ball.radius; // Snap to floor
+    ball.ySpeed = 0;
+    ball.grounded = true;
+    ball.rolling = true; // Start rolling when on floor
   }
 
-  // Move ball right if grounded
-  if (ball.grounded) {
-    ball.x += 2;
-  }
+  // Rolling behavior
+  if (ball.rolling) {
+    ball.x -= 4; // Roll left speed
 
-  // Check collision with canBox
-  if (canBoxIndex >= 0 && canBoxIndex < boxes.length) {
-    let can = boxes[canBoxIndex];
-    if (
-      ball.x + ball.radius > can.x &&
-      ball.x - ball.radius < can.x + can.width &&
-      ball.y + ball.radius > can.y &&
-      ball.y - ball.radius < can.y + can.height
-    ) {
-      boxes.splice(canBoxIndex, 1);
-      let fakeBox = new boxItem(can.x, can.y, can.width, can.height, can.color);
-      fakeBox.passThrough = true;
-      boxes.push(fakeBox);
-      canBoxIndex = -1;
+    // Check collision with red box (can)
+    if (canBoxIndex >= 0) {
+      let can = boxes[canBoxIndex];
+      // Precise collision check
+      if (dist(ball.x, ball.y, can.x + can.width / 2, can.y + can.height / 2) <
+        (ball.radius + max(can.width, can.height) / 2)) {
+
+        // Replace with non-physical block
+        let fakeBox = new boxItem(can.x, can.y, can.width, can.height, can.color);
+        fakeBox.passThrough = true;
+        boxes.splice(canBoxIndex, 1);
+        boxes.push(fakeBox);
+        canBoxIndex = -1;
+
+        // Remove ball
+        level2Objects.ballReleased = false;
+        level2Objects.ball = null;
+      }
     }
   }
 }
 
+// Add this helper function if not exists
+function dist(x1, y1, x2, y2) {
+  return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+}
+
 function checkPlayerButtonCollision() {
   let players = [mousePlayer, birdPlayer];
+  let buttonPressed = false;
 
   for (let player of players) {
-    if (
-      player.x + player.width > level2Objects.button.x &&
+    if (player.x + player.width > level2Objects.button.x &&
       player.x < level2Objects.button.x + level2Objects.button.width * 2 &&
       player.y + player.height > level2Objects.button.y &&
-      player.y < level2Objects.button.y + level2Objects.button.height * 2
-    ) {
-      if (!level2Objects.button.pressed) {
-        level2Objects.button.pressed = true;
-        spawnBall();
-      }
+      player.y < level2Objects.button.y + level2Objects.button.height * 2) {
+      buttonPressed = true;
+      break;
     }
+  }
+
+  // Only spawn ball when button is first pressed
+  if (buttonPressed && !level2Objects.button.pressed) {
+    level2Objects.button.pressed = true;
+    spawnBall();
+  } else if (!buttonPressed) {
+    level2Objects.button.pressed = false;
   }
 }
 
@@ -1279,7 +1335,7 @@ function checkCollision(player) {
 }
 
 function resolveCollision(player, obj) {
-  if (obj.passThrough) return;
+  if (obj.passThrough) return; // NEW: Skip collision if passThrough
 
   if (
     player.x + player.width > obj.x &&
