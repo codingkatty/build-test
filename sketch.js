@@ -37,14 +37,12 @@ let lastTime = 0;
 let level2Objects = {
   ballReleased: false,
   levelComplete: false,
-  leverActivated: false,
   canVisible: true,
   activeCharacter: "mouse",
   can: null,
   button: null,
   ball: null,
   exit: null,
-  lever: null,
 };
 
 let boxes = [];
@@ -1082,7 +1080,6 @@ function setupLevel2() {
   level2Objects = {
     ballReleased: false,
     levelComplete: false,
-    leverActivated: false,
     newRoomSpawned: false,
     button: {
       x: 870,
@@ -1098,15 +1095,7 @@ function setupLevel2() {
       width: 60,
       height: 120,
       color: color(100, 100, 100),
-    },
-    lever: {
-      x: width - 150,
-      y: height - 100,
-      width: 20,
-      height: 10,
-      activated: false,
-      color: color(200, 200, 0),
-    },
+    }
   };
 
   // Add initial red canBox
@@ -1204,18 +1193,17 @@ function drawLevel2() {
   if (counter > 100) {
     background(230, 238, 255);
 
-    // Always draw can images
+    // Draw platforms
+    for (let box of boxes) {
+      box.show();
+    }
+
     if (!canGone) {
       image(colacan, 640, height - 220, 120, 180);
     }
 
     if (showColacan) {
       image(colacan2, 640, height - 220, 120, 180);
-    }
-
-    // Draw platforms
-    for (let box of boxes) {
-      box.show();
     }
 
     checkPlayerButtonCollision();
@@ -1236,24 +1224,6 @@ function drawLevel2() {
     fill(level2Objects.exit.color);
     rect(level2Objects.exit.x, level2Objects.exit.y, level2Objects.exit.width * 1.5, level2Objects.exit.height * 1.5);
 
-    fill(level2Objects.lever.activated ? color(150, 150, 0) : level2Objects.lever.color);
-    rect(level2Objects.lever.x, level2Objects.lever.y, level2Objects.lever.width, level2Objects.lever.height);
-
-    if (mousePlayer.isInteracting && !level2Objects.lever.activated) {
-      if (
-        mousePlayer.x + mousePlayer.width > level2Objects.lever.x &&
-        mousePlayer.x < level2Objects.lever.x + level2Objects.lever.width &&
-        mousePlayer.y + mousePlayer.height > level2Objects.lever.y &&
-        mousePlayer.y < level2Objects.lever.y + level2Objects.lever.height
-      ) {
-        level2Objects.lever.activated = true;
-        for (let box of boxes) {
-          if (box.x === level2Objects.exit.x && box.y === level2Objects.exit.y) {
-            box.passThrough = true;
-          }
-        }
-      }
-    }
 
     if (!level2Objects.newRoomSpawned && mousePlayer.x > width && birdPlayer.x > width) {
       level2Objects.newRoomSpawned = true;
@@ -1285,14 +1255,6 @@ if (level2Objects.ballReleased && level2Objects.ball) {
     level2Objects.ball.y,
     level2Objects.ball.radius * 2
   );
-
-  if (!canGone) {
-    image(colacan, 640, height - 220, 120, 180);
-  }
-
-  if (showColacan) {
-    image(colacan2, 640, height - 220, 120, 180);
-  }
 
   // Call movement
   moveBall();
