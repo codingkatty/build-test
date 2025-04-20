@@ -264,7 +264,9 @@ function draw() {
   } else if (gameState === "correct") {
     correct();
   } else if (gameState === "level2") {
-    drawLevel2(); // Add this line
+    drawLevel2();
+  } else if (gameState === "level2morse") {
+    drawLevel2Morse();
   } else if (gameState === "gameover") {
     background(0, 0, 0);
     fill(255);
@@ -1071,7 +1073,12 @@ function setupLevel2() {
   boxes = [];
 
   // Floor
-  boxes.push(new boxItem(0, height - 80, width, 80, color(100, 70, 50)));
+  boxes.push(new boxItem(580, height - 80, width, 80, color(100, 70, 50)));
+
+  //Platform 1 (obby)
+  boxes.push(new boxItem(30, height - 300, 160, 30, color(100, 70, 50)));
+  // Platform 2 (obby)
+  boxes.push(new boxItem(330, height - 370, 160, 30, color(100, 70, 50)));
 
   // Last platform
   boxes.push(new boxItem(800, height - 320, 200, 30, color(100, 70, 50)));
@@ -1099,15 +1106,15 @@ function setupLevel2() {
   };
 
   // Add initial red canBox
-  canBlock = new boxItem(650, height - 200, 100, 150, color(200, 0, 0));
+  canBlock = new boxItem(680, height - 200, 100, 150, color(200, 0, 0));
   boxes.push(canBlock);
   canBoxIndex = boxes.length - 1;
 
   // Player starting positions
   mousePlayer.x = 100;
-  mousePlayer.y = height - 250;
+  mousePlayer.y = height - 500;
   birdPlayer.x = 100;
-  birdPlayer.y = height - 350;
+  birdPlayer.y = height - 550;
 
   mousePlayer.show();
   mousePlayer.move(boxes);
@@ -1259,6 +1266,48 @@ if (level2Objects.ballReleased && level2Objects.ball) {
   // Call movement
   moveBall();
 }
+
+function setupLevel2Morse() {
+  boxes = [];
+
+  // Floor
+  boxes.push(new boxItem(0, height - 80, width, 80, color(100, 70, 50)));
+}
+
+function drawLevel2Morse() {
+  if (counter === 100) {
+    setupLevel2();
+    resetTimer();
+    startTimer();
+  }
+
+  if (counter > 100) {
+    background(230, 238, 255);
+
+    // Draw platforms
+    for (let box of boxes) {
+      box.show();
+    }
+
+    checkPlayerButtonCollision()
+
+    mousePlayer.show();
+    mousePlayer.move(boxes);
+    checkCollision(mousePlayer);
+
+    birdPlayer.show();
+    birdPlayer.move(boxes);
+    checkCollision(birdPlayer);
+
+    updateTimer();
+    drawTimer();
+  } else {
+    fill(0);
+    textSize(50);
+    text("Level 2 Morse Code", width / 2, height / 2);
+  }
+}
+
 
 // Helper function to constrain value
 function constrain(value, min, max) {
