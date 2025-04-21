@@ -1076,12 +1076,12 @@ function setupLevel2() {
   boxes.push(new boxItem(580, height - 80, width, 80, color(100, 70, 50)));
 
   //Platform 1 (obby)
-  boxes.push(new boxItem(30, height - 300, 160, 30, color(100, 70, 50)));
+  boxes.push(new boxItem(10, height - 300, 150, 30, color(100, 70, 50)));
   // Platform 2 (obby)
-  boxes.push(new boxItem(330, height - 370, 160, 30, color(100, 70, 50)));
+  boxes.push(new boxItem(300, height - 370, 110, 30, color(100, 70, 50)));
 
   // Last platform
-  boxes.push(new boxItem(800, height - 320, 200, 30, color(100, 70, 50)));
+  boxes.push(new boxItem(830, height - 320, 200, 30, color(100, 70, 50)));
 
   // Define level objects
   level2Objects = {
@@ -1106,7 +1106,7 @@ function setupLevel2() {
   };
 
   // Add initial red canBox
-  canBlock = new boxItem(680, height - 200, 100, 150, color(200, 0, 0));
+  canBlock = new boxItem(730, height - 200, 100, 150, color(200, 0, 0));
   boxes.push(canBlock);
   canBoxIndex = boxes.length - 1;
 
@@ -1206,11 +1206,11 @@ function drawLevel2() {
     }
 
     if (!canGone) {
-      image(colacan, 640, height - 220, 120, 180);
+      image(colacan, 720, height - 220, 120, 180);
     }
 
     if (showColacan) {
-      image(colacan2, 640, height - 220, 120, 180);
+      image(colacan2, 720, height - 220, 120, 180);
     }
 
     checkPlayerButtonCollision();
