@@ -7,7 +7,7 @@ let pixel1,
   cat_eyes2,
   cat_eyes3,
   cat_eyes4;
-let mouse_run1, mouse_run2, bird_fly1, bird_fly2, cat_chaser, mouse, bird, colacan;
+let mouse_run1, mouse_run2, bird_fly1, bird_fly2, cat_chaser, mouse, bird, colacan, bird_left, bird_right, board;
 
 let gameState = "costume";
 let overButton = false;
@@ -76,12 +76,16 @@ function preload() {
     (mouse = loadImage("../assets/mouse-vio.png"));
   bird = loadImage("../assets/birdieeee.png");
 
+  bird_left = [loadImage("../gameassets/bird_left1.png"), loadImage("../gameassets/bird_left2.png"), loadImage("../gameassets/bird_left3.png")];
+  bird_right = [loadImage("../gameassets/bird_right1.png"), loadImage("../gameassets/bird_right2.png"), loadImage("../gameassets/bird_right3.png")];
+
   bgm = loadSound("../assets/scary_song.mp3");
   bgm.setVolume(0.4);
 
   oof = loadSound("../assets/oof.mp3");
   colacan = loadImage("../gameassets/colacan-side.png");
   colacan2 = loadImage("../gameassets/colacan-flat.png");
+  board = loadImage("../gameassets/board.png")
 }
 
 class Player {
@@ -554,12 +558,15 @@ function drawCostume() {
   }
 }
 
+let wasd, arrowkey;
 function updatePlayerControls() {
   // Player 1 (WASD)
   if (selectedCharacter1 === "mouse") {
     mousePlayer = new Player(200, 100, mouse, true, 87, 83, 65, 68, 80, 80); // W,S,A,D
+    wasd = "mouse";
   } else {
     birdPlayer = new Player(100, 100, bird, false, 87, 83, 65, 68, 150, 150); // W,S,A,D
+    wasd = "bird";
   }
 
   // Player 2 (Arrow Keys)
@@ -576,6 +583,7 @@ function updatePlayerControls() {
       80,
       80
     );
+    arrowkey = "mouse";
   } else {
     birdPlayer = new Player(
       100,
@@ -589,6 +597,24 @@ function updatePlayerControls() {
       150,
       150
     );
+    arrowkey = "bird";
+  }
+}
+
+let c = 0;
+let last_key = "left"
+function updateBirdImg(birdP, frame) {
+  if (frame % 10 == 0) {c==bird_left.length-1 ? c=0 : c++;}
+  if ((arrowkey == "bird" && keyIsDown(LEFT_ARROW)) || (wasd == "bird" && keyIsDown(68))) {
+    last_key = "left"
+  }
+  if ((arrowkey == "bird" && keyIsDown(RIGHT_ARROW)) || (wasd == "bird" && keyIsDown(65))) {
+    last_key = "right"
+  }
+  if (last_key == "left") {
+    birdP.img = bird_left[c]
+  } else {
+    birdP.img = bird_right[c]
   }
 }
 
@@ -658,8 +684,9 @@ function setupLevel1() {
   boxes.push(new boxItem(0, height - 20, width, 30, color(100, 50, 50)));
 
   mouseBlockIndex = boxes.length;
-  mouseBlock = new boxItem(0, 520, 150, 100, color(0, 180, 0));
+  mouseBlock = new boxItem(-50, 500, 200, 150, color(0, 180, 0, 0));
   boxes.push(mouseBlock);
+  image(board, -50, 500, 200, 150);
 
   buttonW = 80;
   buttonH = 30;
@@ -725,6 +752,8 @@ function drawLevel1() {
 
     mousePlayer.show();
     mousePlayer.move(boxes);
+
+    updateBirdImg(birdPlayer, counter);
 
     birdPlayer.show();
     birdPlayer.move(boxes);
@@ -876,8 +905,9 @@ function checkButtonInteractions() {
       buttonActivated = true;
     }
   } else {
+    image(board, -50, 500, 200, 150);
     if (mouseBlockIndex === -1) {
-      mouseBlock = new boxItem(30, 480, 150, 100, color(0, 180, 0));
+      mouseBlock = new boxItem(-50, 500, 200, 150, color(0, 180, 0, 0));
       boxes.push(mouseBlock);
       mouseBlockIndex = boxes.length - 1;
       buttonActivated = false;
@@ -1055,8 +1085,6 @@ class boxItem {
 
   show() {
     fill(this.color);
-    stroke(0);
-    strokeWeight(2);
     rect(this.x, this.y, this.w, this.h);
   }
 }
@@ -1233,6 +1261,8 @@ function drawLevel2() {
     mousePlayer.show();
     mousePlayer.move(boxes);
     checkCollision(mousePlayer);
+
+    updateBirdImg(birdPlayer, counter);
 
     birdPlayer.show();
     birdPlayer.move(boxes);
