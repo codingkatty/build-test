@@ -48,6 +48,7 @@ let level2Objects = {
 let boxes = [];
 let bgm, oof;
 let pigpen1, pigpen2, pigpen3, pigpen4;
+let pigpencode;
 
 function preload() {
   pixel1 = loadFont("fonts/alagard.ttf");
@@ -91,6 +92,8 @@ function preload() {
   pigpen2 = loadImage('gameassets/PIGPEN2.png');
   pigpen3 = loadImage('gameassets/PIGPEN3.png');
   pigpen4 = loadImage('gameassets/PIGPEN4.png');
+
+  pigpencode = loadImage('gameassets/pigpencode.png');
 }
 
 class Player {
@@ -567,6 +570,7 @@ function drawCostume() {
 
 let wasd, arrowkey;
 function updatePlayerControls() {
+
   // Player 1 (WASD)
   if (selectedCharacter1 === "mouse") {
     mousePlayer = new Player(200, 100, mouse, true, 87, 83, 65, 68, 80, 80); // W,S,A,D
@@ -623,7 +627,11 @@ function updateBirdImg(birdP, frame) {
   } else {
     birdP.img = bird_right[c]
   }
+
+  mousePlayer = tempMouse;
+  birdPlayer = tempBird;
 }
+
 
 function drawModal() {
   // Modal background
@@ -1019,18 +1027,6 @@ function updateCursor() {
 }
 
 function mousePressed() {
-  if (showBigImage) {
-    // Close enlarged image
-    if (
-      mouseX > bigImageX + 370 &&
-      mouseX < bigImageX + 370 + closeButtonSize &&
-      mouseY > bigImageY - 20 &&
-      mouseY < bigImageY - 20 + closeButtonSize
-    ) {
-      showBigImage = false;
-    }
-  }
-
   // If close button (X) is clicked
   if (showModal && dist(mouseX, mouseY, 770, 220) < 15) {
     showModal = false;
@@ -1309,20 +1305,20 @@ function checkPlayerExitCollision() {
 
   for (let player of players) {
     if (
-      player.x < exit.x + exit.width * 1.5 &&
-      player.x + player.width > exit.x &&
-      player.y < exit.y + exit.height * 1.5 &&
-      player.y + player.height > exit.y
+      mousePlayer.x < exit.x + exit.width * 1.5 &&
+      mousePlayer.x + mousePlayer.width > exit.x &&
+      mousePlayer.y < exit.y + exit.height * 1.5 &&
+      mousePlayer.y + player.height > exit.y
     ) {
       gameState = "level2morse";
-      resetTimer(300000);
+      timerDuration = 210; // 5 min
+      resetTimer();
       startTimer();
       setupLevel2Morse();
       return;
     }
   }
 }
-
 
 if (level2Objects.ballReleased && level2Objects.ball) {
   fill(level2Objects.ball.color);
@@ -1332,7 +1328,6 @@ if (level2Objects.ballReleased && level2Objects.ball) {
     level2Objects.ball.radius * 2
   );
 
-  // Call movement
   moveBall();
 }
 
@@ -1368,24 +1363,48 @@ function checkPlayerButtonCollision() {
   }
 }
 
-let showBigImage = false;
-let imageHitbox = { x: 200, y: 200, w: 100, h: 100 };
+let showBigImage1 = false;
+let showBigImage2 = false;
+let showBigImage3 = false;
+let showBigImage4 = false;
+let imageHitbox1 = { x: 130, y: 310, w: 100, h: 100 };
+let imageHitbox2 = { x: 400, y: 20, w: 100, h: 100 };
+let imageHitbox3 = { x: 800, y: 150, w: 100, h: 100 };
+let imageHitbox4 = { x: 1000, y: 480, w: 100, h: 100 };
 let bigImageX = 300;
-let bigImageY = 150;
+let bigImageY = 300;
 let closeButtonSize = 30;
+let keypadBox = { x: 1100, y: 300, w: 100, h: 100 };
+let showKeypad = false;
+let codeInput, submitButton;
+
+let hinttxt2 = "Left to right!";
 
 function setupLevel2Morse() {
   boxes = [];
 
+  updatePlayerControls();
+
   // Floor
   boxes.push(new boxItem(0, height - 80, width, 80, color(100, 70, 50)));
+
+  mousePlayer.x = 100;
+  mousePlayer.y = height - 210;
+  birdPlayer.x = 100;
+  birdPlayer.y = height - 250;
+
+  mousePlayer.velocity = 0;
+  birdPlayer.velocity = 0;
 }
 
 function drawLevel2Morse() {
+  console.log("DRAW LEVEL 2 MORSE");
+
   if (counter === 100) {
-    setupLevel2();
+    setupLevel2Morse();
     resetTimer();
     startTimer();
+    counter++;
   }
 
   if (counter > 100) {
@@ -1396,27 +1415,11 @@ function drawLevel2Morse() {
       box.show();
     }
 
-    if (checkPlayerTouchingImage(mousePlayer) || checkPlayerTouchingImage(birdPlayer)) {
-      showBigImage = true;
-    }
+    image(pigpencode, 400, 300, 500, 200);
 
-    if (!showBigImage) {
-      image(pigpen1, imageHitbox.x, imageHitbox.y, imageHitbox.w, imageHitbox.h);
-    } else {
-      // Show enlarged image
-      image(pigpen1, bigImageX, bigImageY, 400, 300);
-
-      // Red "X" close button
-      fill(255, 0, 0);
-      rect(bigImageX + 370, bigImageY - 20, closeButtonSize, closeButtonSize, 5);
-
-      fill(255);
-      textSize(20);
-      textAlign(CENTER, CENTER);
-      text("X", bigImageX + 370 + closeButtonSize / 2, bigImageY - 20 + closeButtonSize / 2);
-    }
-
-    checkPlayerButtonCollision()
+    fill(0, 0, 0);
+    textSize(20);
+    text(hinttxt2, 200, 70);
 
     mousePlayer.show();
     mousePlayer.move(boxes);
@@ -1426,8 +1429,188 @@ function drawLevel2Morse() {
     birdPlayer.move(boxes);
     checkCollision(birdPlayer);
 
+    if (!showBigImage1) {
+      image(pigpen1, imageHitbox1.x, imageHitbox1.y, imageHitbox1.w, imageHitbox1.h);
+
+      if (
+        checkPlayerTouchingImage(mousePlayer, imageHitbox1) ||
+        checkPlayerTouchingImage(birdPlayer, imageHitbox1)
+      ) {
+        showBigImage1 = true;
+      }
+    } else {
+      let bigW = 700;
+      let bigH = 600;
+      let centerX = width / 2 - bigW / 2;
+      let centerY = height / 2 - bigH / 2;
+
+      image(pigpen1, centerX, centerY, bigW, bigH);
+
+      fill(255, 0, 0);
+      rect(centerX + bigW - 20, centerY - 20, closeButtonSize, closeButtonSize, 5);
+      fill(255);
+      textSize(20);
+      textAlign(CENTER, CENTER);
+      text("X", centerX + bigW - 20 + closeButtonSize / 2, centerY - 20 + closeButtonSize / 2);
+
+      if (
+        mouseIsPressed &&
+        mouseX > centerX + bigW - 20 &&
+        mouseX < centerX + bigW - 20 + closeButtonSize &&
+        mouseY > centerY - 20 &&
+        mouseY < centerY - 20 + closeButtonSize
+      ) {
+        showBigImage1 = false;
+      }
+    }
+
+    // --- PIGPEN 2 ---
+    if (!showBigImage2) {
+      image(pigpen2, imageHitbox2.x, imageHitbox2.y, imageHitbox2.w, imageHitbox2.h);
+
+      if (
+        checkPlayerTouchingImage(mousePlayer, imageHitbox2) ||
+        checkPlayerTouchingImage(birdPlayer, imageHitbox2)
+      ) {
+        showBigImage2 = true;
+      }
+    } else {
+      let bigW = 700;
+      let bigH = 600;
+      let centerX = width / 2 - bigW / 2;
+      let centerY = height / 2 - bigH / 2;
+
+      image(pigpen2, centerX, centerY, bigW, bigH);
+
+      fill(255, 0, 0);
+      rect(centerX + bigW - 20, centerY - 20, closeButtonSize, closeButtonSize, 5);
+      fill(255);
+      textSize(20);
+      textAlign(CENTER, CENTER);
+      text("X", centerX + bigW - 20 + closeButtonSize / 2, centerY - 20 + closeButtonSize / 2);
+
+      if (
+        mouseIsPressed &&
+        mouseX > centerX + bigW - 20 &&
+        mouseX < centerX + bigW - 20 + closeButtonSize &&
+        mouseY > centerY - 20 &&
+        mouseY < centerY - 20 + closeButtonSize
+      ) {
+        showBigImage2 = false;
+      }
+    }
+
+    //PIGPEN 3
+    if (!showBigImage3) {
+      image(pigpen3, imageHitbox3.x, imageHitbox3.y, imageHitbox3.w, imageHitbox3.h);
+
+      if (
+        checkPlayerTouchingImage(mousePlayer, imageHitbox3) ||
+        checkPlayerTouchingImage(birdPlayer, imageHitbox3)
+      ) {
+        showBigImage3 = true;
+      }
+    } else {
+      let bigW = 700;
+      let bigH = 600;
+      let centerX = width / 2 - bigW / 2;
+      let centerY = height / 2 - bigH / 2;
+
+      image(pigpen3, centerX, centerY, bigW, bigH);
+
+      fill(255, 0, 0);
+      rect(centerX + bigW - 20, centerY - 20, closeButtonSize, closeButtonSize, 5);
+      fill(255);
+      textSize(20);
+      textAlign(CENTER, CENTER);
+      text("X", centerX + bigW - 20 + closeButtonSize / 2, centerY - 20 + closeButtonSize / 2);
+
+      if (
+        mouseIsPressed &&
+        mouseX > centerX + bigW - 20 &&
+        mouseX < centerX + bigW - 20 + closeButtonSize &&
+        mouseY > centerY - 20 &&
+        mouseY < centerY - 20 + closeButtonSize
+      ) {
+        showBigImage3 = false;
+      }
+    }
+
+    if (!showBigImage4) {
+      image(pigpen4, imageHitbox4.x, imageHitbox4.y, imageHitbox4.w, imageHitbox4.h);
+
+      if (
+        checkPlayerTouchingImage(mousePlayer, imageHitbox4) ||
+        checkPlayerTouchingImage(birdPlayer, imageHitbox4)
+      ) {
+        showBigImage4 = true;
+      }
+    } else {
+      let bigW = 700;
+      let bigH = 600;
+      let centerX = width / 2 - bigW / 2;
+      let centerY = height / 2 - bigH / 2;
+
+      image(pigpen4, centerX, centerY, bigW, bigH);
+
+      fill(255, 0, 0);
+      rect(centerX + bigW - 20, centerY - 20, closeButtonSize, closeButtonSize, 5);
+      fill(255);
+      textSize(20);
+      textAlign(CENTER, CENTER);
+      text("X", centerX + bigW - 20 + closeButtonSize / 2, centerY - 20 + closeButtonSize / 2);
+
+      if (
+        mouseIsPressed &&
+        mouseX > centerX + bigW - 20 &&
+        mouseX < centerX + bigW - 20 + closeButtonSize &&
+        mouseY > centerY - 20 &&
+        mouseY < centerY - 20 + closeButtonSize
+      ) {
+        showBigImage4 = false;
+      }
+    }
+
+    // Draw keypad box
+    fill(200, 150, 255);
+    rect(keypadBox.x, keypadBox.y, keypadBox.w, keypadBox.h);
+    fill(0);
+    textSize(14);
+    textAlign(CENTER, CENTER);
+    text("Enter Code", keypadBox.x + keypadBox.w / 2, keypadBox.y + keypadBox.h / 2);
+
+    // If player touches it, show input + button
+    if (!showKeypad && (
+      checkPlayerTouchingImage(mousePlayer, keypadBox) ||
+      checkPlayerTouchingImage(birdPlayer, keypadBox)
+    )) {
+      showKeypad = true;
+
+      // Create input box
+      codeInput = createInput();
+      codeInput.position(keypadBox.x, keypadBox.y + 110);
+      codeInput.size(100);
+
+      // Create submit button
+      submitButton = createButton('Submit');
+      submitButton.position(keypadBox.x, keypadBox.y + 140);
+      submitButton.mousePressed(() => {
+        if (codeInput.value() === "ESCAPE") {
+          console.log("correct");
+        } else {
+          console.log("wrong code");
+        }
+        codeInput.remove();
+        submitButton.remove();
+        showKeypad = false;
+      });
+    }
+
+
+    checkPlayerButtonCollision();
     updateTimer();
     drawTimer();
+
   } else {
     fill(0);
     textSize(50);
@@ -1435,7 +1618,7 @@ function drawLevel2Morse() {
   }
 }
 
-function checkPlayerTouchingImage(player) {
+function checkPlayerTouchingImage(player, imageHitbox) {
   return (
     player.x < imageHitbox.x + imageHitbox.w &&
     player.x + player.width > imageHitbox.x &&
