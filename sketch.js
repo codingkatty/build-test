@@ -9,7 +9,7 @@ let pixel1,
   cat_eyes4;
 let mouse_run1, mouse_run2, bird_fly1, bird_fly2, cat_chaser, mouse, bird, colacan, bird_left, bird_right, board;
 
-let gameState = "costume";
+let gameState = "level2";
 let overButton = false;
 let showModal = false;
 
@@ -47,45 +47,50 @@ let level2Objects = {
 
 let boxes = [];
 let bgm, oof;
+let pigpen1, pigpen2, pigpen3, pigpen4;
 
 function preload() {
-  pixel1 = loadFont("../fonts/alagard.ttf");
-  pixel2 = loadFont("../fonts/minecraft_font.ttf");
+  pixel1 = loadFont("fonts/alagard.ttf");
+  pixel2 = loadFont("fonts/minecraft_font.ttf");
 
-  cat_frame1 = loadImage("../assets/cat_walk_test1.png");
-  cat_frame2 = loadImage("../assets/cat_walk_test2.png");
-  cat_base = loadImage("../assets/cat_base_test.png");
+  cat_frame1 = loadImage("assets/cat_walk_test1.png");
+  cat_frame2 = loadImage("assets/cat_walk_test2.png");
+  cat_base = loadImage("assets/cat_base_test.png");
 
-  cat_eyes1 = loadImage("../assets/cat_eyes_test1.png");
-  cat_eyes2 = loadImage("../assets/cat_eyes_test2.png");
-  cat_eyes3 = loadImage("../assets/cat_eyes_test3.png");
-  cat_eyes4 = loadImage("../assets/cat_eyes_test4.png");
+  cat_eyes1 = loadImage("assets/cat_eyes_test1.png");
+  cat_eyes2 = loadImage("assets/cat_eyes_test2.png");
+  cat_eyes3 = loadImage("assets/cat_eyes_test3.png");
+  cat_eyes4 = loadImage("assets/cat_eyes_test4.png");
 
-  mouse_run1 = loadImage("../assets/mouse_run_anim_test1.png");
-  mouse_run2 = loadImage("../assets/mouse_run_anim_test2.png");
+  mouse_run1 = loadImage("assets/mouse_run_anim_test1.png");
+  mouse_run2 = loadImage("assets/mouse_run_anim_test2.png");
 
-  bird_fly1 = loadImage("../assets/bird_run_anim_test1.png");
-  bird_fly2 = loadImage("../assets/bird_run_anim_test2.png");
+  bird_fly1 = loadImage("assets/bird_run_anim_test1.png");
+  bird_fly2 = loadImage("assets/bird_run_anim_test2.png");
 
-  (cat_walk1 = loadImage("../assets/pixil-frame-0.png")),
-    (cat_walk2 = loadImage("../assets/pixil-frame-1.png")),
-    (cat_walk3 = loadImage("../assets/pixil-frame-2.png")),
-    (cat_walk4 = loadImage("../assets/pixil-frame-3.png")),
-    (cat_walk5 = loadImage("../assets/pixil-frame-4.png")),
-    (cat_walk6 = loadImage("../assets/pixil-frame-5.png")),
-    (mouse = loadImage("../assets/mouse-vio.png"));
-  bird = loadImage("../assets/birdieeee.png");
+  (cat_walk1 = loadImage("assets/pixil-frame-0.png")),
+    (cat_walk2 = loadImage("assets/pixil-frame-1.png")),
+    (cat_walk3 = loadImage("assets/pixil-frame-2.png")),
+    (cat_walk4 = loadImage("assets/pixil-frame-3.png")),
+    (cat_walk5 = loadImage("assets/pixil-frame-4.png")),
+    (cat_walk6 = loadImage("assets/pixil-frame-5.png")),
+    (mouse = loadImage("assets/mouse-vio.png"));
+  bird = loadImage("assets/birdieeee.png");
 
   bird_left = [loadImage("../gameassets/bird_left1.png"), loadImage("../gameassets/bird_left2.png"), loadImage("../gameassets/bird_left3.png")];
   bird_right = [loadImage("../gameassets/bird_right1.png"), loadImage("../gameassets/bird_right2.png"), loadImage("../gameassets/bird_right3.png")];
-
-  bgm = loadSound("../assets/scary_song.mp3");
-  bgm.setVolume(0.4);
 
   oof = loadSound("../assets/oof.mp3");
   colacan = loadImage("../gameassets/colacan-side.png");
   colacan2 = loadImage("../gameassets/colacan-flat.png");
   board = loadImage("../gameassets/board.png")
+  bgm = loadSound("assets/scary_song.mp3");
+  bgm.setVolume(0.4);
+
+  pigpen1 = loadImage('gameassets/PIGPEN1.png');
+  pigpen2 = loadImage('gameassets/PIGPEN2.png');
+  pigpen3 = loadImage('gameassets/PIGPEN3.png');
+  pigpen4 = loadImage('gameassets/PIGPEN4.png');
 }
 
 class Player {
@@ -268,7 +273,9 @@ function draw() {
   } else if (gameState === "correct") {
     correct();
   } else if (gameState === "level2") {
-    drawLevel2(); // Add this line
+    drawLevel2();
+  } else if (gameState === "level2morse") {
+    drawLevel2Morse();
   } else if (gameState === "gameover") {
     background(0, 0, 0);
     fill(255);
@@ -670,7 +677,7 @@ let hinttxt = "are mice colorblind??";
 function setupLevel1() {
   boxes = [];
 
-  // Platforms and walls
+  // Platforms
   boxes.push(new boxItem(200, height - 200, 200, 30, color(100, 70, 50)));
   boxes.push(new boxItem(600, height - 300, 200, 30, color(100, 70, 50)));
 
@@ -680,7 +687,7 @@ function setupLevel1() {
     );
   }
 
-  // Ground
+  // Floor
   boxes.push(new boxItem(0, height - 20, width, 30, color(100, 50, 50)));
 
   mouseBlockIndex = boxes.length;
@@ -1012,6 +1019,18 @@ function updateCursor() {
 }
 
 function mousePressed() {
+  if (showBigImage) {
+    // Close enlarged image
+    if (
+      mouseX > bigImageX + 370 &&
+      mouseX < bigImageX + 370 + closeButtonSize &&
+      mouseY > bigImageY - 20 &&
+      mouseY < bigImageY - 20 + closeButtonSize
+    ) {
+      showBigImage = false;
+    }
+  }
+
   // If close button (X) is clicked
   if (showModal && dist(mouseX, mouseY, 770, 220) < 15) {
     showModal = false;
@@ -1099,10 +1118,15 @@ function setupLevel2() {
   boxes = [];
 
   // Floor
-  boxes.push(new boxItem(0, height - 80, width, 80, color(100, 70, 50)));
+  boxes.push(new boxItem(580, height - 80, width, 80, color(100, 70, 50)));
+
+  //Platform 1 (obby)
+  boxes.push(new boxItem(10, height - 300, 150, 30, color(100, 70, 50)));
+  // Platform 2 (obby)
+  boxes.push(new boxItem(280, height - 370, 130, 30, color(100, 70, 50)));
 
   // Last platform
-  boxes.push(new boxItem(800, height - 320, 200, 30, color(100, 70, 50)));
+  boxes.push(new boxItem(830, height - 320, 200, 30, color(100, 70, 50)));
 
   // Define level objects
   level2Objects = {
@@ -1118,7 +1142,7 @@ function setupLevel2() {
       color: color(255, 0, 0),
     },
     exit: {
-      x: width - 100,
+      x: width - 80,
       y: height - 260,
       width: 60,
       height: 120,
@@ -1127,15 +1151,15 @@ function setupLevel2() {
   };
 
   // Add initial red canBox
-  canBlock = new boxItem(650, height - 200, 100, 150, color(200, 0, 0));
+  canBlock = new boxItem(750, height - 200, 100, 150, color(200, 0, 0));
   boxes.push(canBlock);
   canBoxIndex = boxes.length - 1;
 
   // Player starting positions
   mousePlayer.x = 100;
-  mousePlayer.y = height - 250;
+  mousePlayer.y = height - 500;
   birdPlayer.x = 100;
-  birdPlayer.y = height - 350;
+  birdPlayer.y = height - 550;
 
   mousePlayer.show();
   mousePlayer.move(boxes);
@@ -1227,11 +1251,11 @@ function drawLevel2() {
     }
 
     if (!canGone) {
-      image(colacan, 640, height - 220, 120, 180);
+      image(colacan, 740, height - 220, 120, 180);
     }
 
     if (showColacan) {
-      image(colacan2, 640, height - 220, 120, 180);
+      image(colacan2, 740, height - 220, 120, 180);
     }
 
     checkPlayerButtonCollision();
@@ -1268,12 +1292,34 @@ function drawLevel2() {
     birdPlayer.move(boxes);
     checkCollision(birdPlayer);
 
+    checkPlayerExitCollision();
+
     updateTimer();
     drawTimer();
   } else {
     fill(0);
     textSize(50);
     text("Level 2", width / 2, height / 2);
+  }
+}
+
+function checkPlayerExitCollision() {
+  const exit = level2Objects.exit;
+  const players = [mousePlayer, birdPlayer];
+
+  for (let player of players) {
+    if (
+      player.x < exit.x + exit.width * 1.5 &&
+      player.x + player.width > exit.x &&
+      player.y < exit.y + exit.height * 1.5 &&
+      player.y + player.height > exit.y
+    ) {
+      gameState = "level2morse";
+      resetTimer(300000);
+      startTimer();
+      setupLevel2Morse();
+      return;
+    }
   }
 }
 
@@ -1290,7 +1336,6 @@ if (level2Objects.ballReleased && level2Objects.ball) {
   moveBall();
 }
 
-// Helper function to constrain value
 function constrain(value, min, max) {
   return value < min ? min : (value > max ? max : value);
 }
@@ -1322,6 +1367,83 @@ function checkPlayerButtonCollision() {
     level2Objects.button.pressed = false;
   }
 }
+
+let showBigImage = false;
+let imageHitbox = { x: 200, y: 200, w: 100, h: 100 };
+let bigImageX = 300;
+let bigImageY = 150;
+let closeButtonSize = 30;
+
+function setupLevel2Morse() {
+  boxes = [];
+
+  // Floor
+  boxes.push(new boxItem(0, height - 80, width, 80, color(100, 70, 50)));
+}
+
+function drawLevel2Morse() {
+  if (counter === 100) {
+    setupLevel2();
+    resetTimer();
+    startTimer();
+  }
+
+  if (counter > 100) {
+    background(230, 238, 255);
+
+    // Draw platforms
+    for (let box of boxes) {
+      box.show();
+    }
+
+    if (checkPlayerTouchingImage(mousePlayer) || checkPlayerTouchingImage(birdPlayer)) {
+      showBigImage = true;
+    }
+
+    if (!showBigImage) {
+      image(pigpen1, imageHitbox.x, imageHitbox.y, imageHitbox.w, imageHitbox.h);
+    } else {
+      // Show enlarged image
+      image(pigpen1, bigImageX, bigImageY, 400, 300);
+
+      // Red "X" close button
+      fill(255, 0, 0);
+      rect(bigImageX + 370, bigImageY - 20, closeButtonSize, closeButtonSize, 5);
+
+      fill(255);
+      textSize(20);
+      textAlign(CENTER, CENTER);
+      text("X", bigImageX + 370 + closeButtonSize / 2, bigImageY - 20 + closeButtonSize / 2);
+    }
+
+    checkPlayerButtonCollision()
+
+    mousePlayer.show();
+    mousePlayer.move(boxes);
+    checkCollision(mousePlayer);
+
+    birdPlayer.show();
+    birdPlayer.move(boxes);
+    checkCollision(birdPlayer);
+
+    updateTimer();
+    drawTimer();
+  } else {
+    fill(0);
+    textSize(50);
+    text("Level 2 Morse Code", width / 2, height / 2);
+  }
+}
+
+function checkPlayerTouchingImage(player) {
+  return (
+    player.x < imageHitbox.x + imageHitbox.w &&
+    player.x + player.width > imageHitbox.x &&
+    player.y < imageHitbox.y + imageHitbox.h &&
+    player.y + player.height > imageHitbox.y
+  );
+}
+
 
 function checkCollision(player) {
   for (let box of boxes) {
