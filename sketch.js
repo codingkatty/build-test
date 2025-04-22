@@ -627,9 +627,6 @@ function updateBirdImg(birdP, frame) {
   } else {
     birdP.img = bird_right[c]
   }
-
-  mousePlayer = tempMouse;
-  birdPlayer = tempBird;
 }
 
 
