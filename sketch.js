@@ -9,7 +9,7 @@ let pixel1,
   cat_eyes4;
 let mouse_run1, mouse_run2, bird_fly1, bird_fly2, cat_chaser, mouse, bird, colacan, bird_left, bird_right, board;
 
-let gameState = "level2";
+let gameState = "menu";
 let overButton = false;
 let showModal = false;
 
@@ -615,7 +615,7 @@ function updatePlayerControls() {
 let c = 0;
 let last_key = "left"
 function updateBirdImg(birdP, frame) {
-  if (frame % 10 == 0) {c==bird_left.length-1 ? c=0 : c++;}
+  if (frame % 10 == 0) { c == bird_left.length - 1 ? c = 0 : c++; }
   if ((arrowkey == "bird" && keyIsDown(LEFT_ARROW)) || (wasd == "bird" && keyIsDown(68))) {
     last_key = "left"
   }
