@@ -8,8 +8,9 @@ let pixel1,
   cat_eyes3,
   cat_eyes4;
 let mouse_run1, mouse_run2, bird_fly1, bird_fly2, cat_chaser, mouse, bird, colacan, bird_left, bird_right, board;
+let morse;
 
-let gameState = "level2";
+let gameState = "level3";
 let overButton = false;
 let showModal = false;
 
@@ -50,6 +51,10 @@ let bgm, oof;
 let pigpen1, pigpen2, pigpen3, pigpen4;
 let pigpencode;
 
+let timeData = [];
+let totalTime = [];
+let lastTimeData = 0;
+
 function preload() {
   pixel1 = loadFont("fonts/alagard.ttf");
   pixel2 = loadFont("fonts/minecraft_font.ttf");
@@ -69,13 +74,14 @@ function preload() {
   bird_fly1 = loadImage("assets/bird_run_anim_test1.png");
   bird_fly2 = loadImage("assets/bird_run_anim_test2.png");
 
-  (cat_walk1 = loadImage("assets/pixil-frame-0.png")),
-    (cat_walk2 = loadImage("assets/pixil-frame-1.png")),
-    (cat_walk3 = loadImage("assets/pixil-frame-2.png")),
-    (cat_walk4 = loadImage("assets/pixil-frame-3.png")),
-    (cat_walk5 = loadImage("assets/pixil-frame-4.png")),
-    (cat_walk6 = loadImage("assets/pixil-frame-5.png")),
-    (mouse = loadImage("assets/mouse-vio.png"));
+  cat_walk1 = loadImage("assets/pixil-frame-0.png");
+  cat_walk2 = loadImage("assets/pixil-frame-1.png");
+  cat_walk3 = loadImage("assets/pixil-frame-2.png");
+  cat_walk4 = loadImage("assets/pixil-frame-3.png");
+  cat_walk5 = loadImage("assets/pixil-frame-4.png");
+  cat_walk6 = loadImage("assets/pixil-frame-5.png");
+  mouse_left = loadImage("assets/mouse-vio-left.png");
+  mouse_right = loadImage("assets/mouse-vio-right.png");
   bird = loadImage("assets/birdieeee.png");
 
   bird_left = [loadImage("../gameassets/bird_left1.png"), loadImage("../gameassets/bird_left2.png"), loadImage("../gameassets/bird_left3.png")];
@@ -94,6 +100,9 @@ function preload() {
   pigpen4 = loadImage('gameassets/PIGPEN4.png');
 
   pigpencode = loadImage('gameassets/pigpencode.png');
+
+  morse = loadImage('assets/morse.jpg');
+  portal = loadImage('gameassets/portal.png');
 }
 
 class Player {
@@ -248,7 +257,7 @@ function setup() {
   mousePlayer = new Player(
     200,
     100,
-    mouse,
+    mouse_left,
     true,
     UP_ARROW,
     DOWN_ARROW,
@@ -279,12 +288,20 @@ function draw() {
     drawLevel2();
   } else if (gameState === "level2morse") {
     drawLevel2Morse();
+  } else if (gameState === "level3") {
+    drawLevel3();
   } else if (gameState === "gameover") {
     background(0, 0, 0);
     fill(255);
     textSize(30);
     textAlign(CENTER);
     text("(you died)", width / 2, height / 2);
+  } else if (gameState === "victory") {
+    background(0, 0, 0);
+    fill(255);
+    textSize(30);
+    textAlign(CENTER);
+    text("you win!!!", width / 2, height / 2);
   }
 
   if (showModal) {
@@ -302,6 +319,8 @@ function draw() {
 }
 
 function startTimer() {
+  lastTimeData = timerDuration;
+  totalTime.push(timerDuration);
   timerStarted = true;
   timerPaused = false;
   lastTime = millis();
@@ -319,6 +338,7 @@ function resumeTimer() {
 }
 
 function resetTimer() {
+  timeData.push(currentTime);
   currentTime = timerDuration;
   timerStarted = false;
   timerPaused = false;
@@ -341,6 +361,21 @@ function updateTimer() {
       oof.play();
     }
   }
+}
+
+function saveRun(name = "bird and mouse") {
+  let data = 0;
+  let total = 0;
+
+  for (let i = 0; i < timeData.length; i++) {
+    data += timeData[i];
+    total += totalTime[i];
+  }
+
+  let xhr = new XMLHttpRequest();
+  xhr.open("POST", "http://localhost:5000/new", true);
+  xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  xhr.send(JSON.stringify({ player: name, score: Math.floor(data / total * 100) }));
 }
 
 function drawTimer(c = 0) {
@@ -505,9 +540,9 @@ function drawCostume() {
 
   // Display current character
   if (selectedCharacter1 === "mouse") {
-    image(mouse, 185, 240, 220, 190);
+    image(mouse_left, 185, 240, 220, 190);
   } else {
-    image(bird, 200, 240, 200, 200);
+    image(bird_left[0], 200, 240, 200, 200);
   }
 
   // Right arrow button
@@ -527,9 +562,9 @@ function drawCostume() {
 
   // Display current character
   if (selectedCharacter2 === "mouse") {
-    image(mouse, 800, 240, 220, 190);
+    image(mouse_right, 800, 240, 220, 190);
   } else {
-    image(bird, 800, 240, 200, 200);
+    image(bird_right[0], 800, 240, 200, 200);
   }
 
   // Right arrow button
@@ -573,7 +608,7 @@ function updatePlayerControls() {
 
   // Player 1 (WASD)
   if (selectedCharacter1 === "mouse") {
-    mousePlayer = new Player(200, 100, mouse, true, 87, 83, 65, 68, 80, 80); // W,S,A,D
+    mousePlayer = new Player(200, 100, mouse_left, true, 87, 83, 65, 68, 80, 80); // W,S,A,D
     wasd = "mouse";
   } else {
     birdPlayer = new Player(100, 100, bird, false, 87, 83, 65, 68, 150, 150); // W,S,A,D
@@ -585,7 +620,7 @@ function updatePlayerControls() {
     mousePlayer = new Player(
       200,
       100,
-      mouse,
+      mouse_left,
       true,
       UP_ARROW,
       DOWN_ARROW,
@@ -615,17 +650,27 @@ function updatePlayerControls() {
 let c = 0;
 let last_key = "left"
 function updateBirdImg(birdP, frame) {
-  if (frame % 10 == 0) {c==bird_left.length-1 ? c=0 : c++;}
-  if ((arrowkey == "bird" && keyIsDown(LEFT_ARROW)) || (wasd == "bird" && keyIsDown(68))) {
+  if (frame % 10 == 0) { c == bird_left.length - 1 ? c = 0 : c++; }
+  if ((arrowkey == "bird" && keyIsDown(LEFT_ARROW)) || (wasd == "bird" && keyIsDown(65))) {
     last_key = "left"
   }
-  if ((arrowkey == "bird" && keyIsDown(RIGHT_ARROW)) || (wasd == "bird" && keyIsDown(65))) {
+  if ((arrowkey == "bird" && keyIsDown(RIGHT_ARROW)) || (wasd == "bird" && keyIsDown(68))) {
     last_key = "right"
   }
   if (last_key == "left") {
     birdP.img = bird_left[c]
   } else {
     birdP.img = bird_right[c]
+  }
+}
+
+function updateMouseDir(mouseP) {
+  if ((arrowkey == "mouse" && keyIsDown(LEFT_ARROW)) || (wasd == "mouse" && keyIsDown(65))) {
+    mouseP.img = mouse_left;
+  }
+  if ((arrowkey == "mouse" && keyIsDown(RIGHT_ARROW)) || (wasd == "mouse" && keyIsDown(68))) {
+    mouseP.img = mouse_right;
+
   }
 }
 
@@ -762,10 +807,16 @@ function drawLevel1() {
     }
     checkButtonInteractions();
 
+    if (mousePlayer.y > 2000) {
+      mousePlayer.x = 200;
+      mousePlayer.y = 100;
+    }
+
     mousePlayer.show();
     mousePlayer.move(boxes);
 
     updateBirdImg(birdPlayer, counter);
+    updateMouseDir(mousePlayer);
 
     birdPlayer.show();
     birdPlayer.move(boxes);
@@ -819,6 +870,7 @@ function drawLevel1Door() {
 
   textAlign(LEFT);
   text(riddles[randomR], 30, 500);
+  updateMouseDir(mousePlayer);
   mousePlayer.show();
   mousePlayer.move(boxes);
 
@@ -1213,7 +1265,7 @@ function moveBall() {
   if (ball.rolling) {
     ball.x -= 4;
 
-    if (ball.x <= 750 && ball.x >= 650) {
+    if (ball.x < 850) {
       if (canBoxIndex >= 0 && canBoxIndex < boxes.length) {
         boxes.splice(canBoxIndex, 1);
         canBoxIndex = -1;
@@ -1275,11 +1327,17 @@ function drawLevel2() {
       boxes.push(new boxItem(0, height - 80, width, 80, color(100, 70, 50)));
     }
 
+    if (mousePlayer.y > 2000) {
+      mousePlayer.x = 100;
+      mousePlayer.y = height - 500;
+    }
+
     mousePlayer.show();
     mousePlayer.move(boxes);
     checkCollision(mousePlayer);
 
     updateBirdImg(birdPlayer, counter);
+    updateMouseDir(mousePlayer);
 
     birdPlayer.show();
     birdPlayer.move(boxes);
@@ -1394,6 +1452,27 @@ function setupLevel2Morse() {
   birdPlayer.velocity = 0;
 }
 
+let keys = [];
+let seedX = [];
+let seedY = [];
+let lastinput;
+
+function findSequence(array, sequence) {
+  for (let i = 0; i <= array.length - sequence.length; i++) {
+    let match = true;
+    for (let j = 0; j < sequence.length; j++) {
+      if (array[i + j] !== sequence[j]) {
+        match = false;
+        break;
+      }
+    }
+    if (match) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 function drawLevel2Morse() {
   console.log("DRAW LEVEL 2 MORSE");
 
@@ -1407,6 +1486,11 @@ function drawLevel2Morse() {
   if (counter > 100) {
     background(230, 238, 255);
 
+    for (let i = 0; i < keys.length; i++) {
+      fill(100, 0, 0);
+      text(keys[i], seedX[i], seedY[i]);
+    }
+
     // Draw platforms
     for (let box of boxes) {
       box.show();
@@ -1418,6 +1502,19 @@ function drawLevel2Morse() {
     textSize(20);
     text(hinttxt2, 200, 70);
 
+    image(pigpen1, 130, 310, 100, 100);
+    image(pigpen2, 400, 20, 100, 100);
+    image(pigpen3, 800, 150, 100, 100);
+    image(pigpen4, 1000, 480, 100, 100);
+
+    updateBirdImg(birdPlayer, counter);
+    updateMouseDir(mousePlayer);
+
+    if (mousePlayer > 2000) {
+      mousePlayer.x = 100;
+      mousePlayer.y = height - 210;
+    }
+
     mousePlayer.show();
     mousePlayer.move(boxes);
     checkCollision(mousePlayer);
@@ -1426,6 +1523,7 @@ function drawLevel2Morse() {
     birdPlayer.move(boxes);
     checkCollision(birdPlayer);
 
+    /*
     if (!showBigImage1) {
       image(pigpen1, imageHitbox1.x, imageHitbox1.y, imageHitbox1.w, imageHitbox1.h);
 
@@ -1567,8 +1665,10 @@ function drawLevel2Morse() {
         showBigImage4 = false;
       }
     }
+      */
 
     // Draw keypad box
+    /*
     fill(200, 150, 255);
     rect(keypadBox.x, keypadBox.y, keypadBox.w, keypadBox.h);
     fill(0);
@@ -1601,17 +1701,331 @@ function drawLevel2Morse() {
         submitButton.remove();
         showKeypad = false;
       });
-    }
+    }*/
 
+    if (keyIsPressed) {
+      if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', lastinput].includes(key)) {
+        keys.push(key);
+        seedX.push(width * Math.random());
+        seedY.push(height * Math.random());
+        lastinput = key;
+
+        if (findSequence(keys, ['e', 's', 'c', 'a', 'p', 'e']) !== -1) {
+          console.log("ESCAPE");
+          gameState = "level3";
+          counter = 0;
+        }
+      }
+    }
 
     checkPlayerButtonCollision();
     updateTimer();
     drawTimer();
-
   } else {
     fill(0);
     textSize(50);
     text("Level 2 Morse Code", width / 2, height / 2);
+  }
+}
+
+let code = ".-. ..- -."; //run
+let mI = code.length;
+let mTimer = 0;
+let flash = false;
+let osc = 20;
+let dirUp = true;
+
+function morseFlasher(x, y) {
+  let dot = 10;
+  let dash = 60;
+  let space = 30;
+  let gap = 100;
+
+  if (mI > code.length - 1) {
+    if (mTimer < 200) {
+      flash = false;
+    } else {
+      mI = 0;
+      mTimer = 0;
+      flash = false;
+    }
+  }
+
+  if (code[mI] === ".") {
+    if (mTimer < dot) {
+      flash = true;
+    } else if (mTimer < dot + space) {
+      flash = false;
+    } else {
+      mI++;
+      mTimer = 0;
+    }
+  } else if (code[mI] === "-") {
+    if (mTimer < dash) {
+      flash = true;
+    } else if (mTimer < dash + space) {
+      flash = false;
+    } else {
+      mI++;
+      mTimer = 0;
+    }
+  } else if (code[mI] === " ") {
+    if (mTimer < gap) {
+      flash = false;
+    } else {
+      mI++;
+      mTimer = 0;
+    }
+  }
+
+  fill(0);
+  circle(x, y, 70);
+
+  fill(255, 0, 0);
+  circle(x, y, 60);
+  noStroke();
+  if (flash) {
+    fill(255, 100, 100);
+    circle(x, y, 30);
+  } else {
+    fill(100, 0, 0);
+    circle(x, y, 30);
+  }
+
+  mTimer++;
+}
+
+function drawLevel3Prop() {
+  push();
+  translate(500, 150);
+  rotate(sin(frameCount / 60) / osc);
+  image(morse, -80, 0, 150, 180);
+  pop();
+
+  image(portal, portalX, portalY, 29*8, 54*8);
+  if (dirUp) {
+    portalY+=0.1;
+  } else {
+    portalY-=0.1;
+  }
+
+  if (dirUp && portalY > 120) {
+    dirUp = false;
+  } else if (!dirUp && portalY < 100) {
+    dirUp = true;
+  }
+}
+
+let doorX = [-10, 300, 610, 920];
+let door4unlocked = false;
+let door4opened = false;
+let input = "";
+let triggerInput = false;
+let s = true;
+let door4c = [255, 0, 0];
+
+let portalX = 970;
+let portalY = 110;
+
+function checkForTrigger() {
+  if (collideRectRect(
+    birdPlayer.x,
+    birdPlayer.y,
+    birdPlayer.width,
+    birdPlayer.height,
+    doorX[2] + 50,
+    110,
+    200 - birdPlayer.width,
+    100
+  ) && s) { triggerInput = true; } else { triggerInput = false; }
+
+  if (!triggerInput) {
+    fill(160, 60, 20);
+    rect(doorX[2] + 50, 110, 200, 100);
+
+    fill(255);
+    textSize(20);
+    text("listen. to...", doorX[2] + 150, 160);
+  }
+
+}
+
+function enterKey() {
+  rectMode(CENTER);
+  fill(255);
+  rect(width / 2, height / 2, 400, 300);
+  rect(width / 2, height / 2 + 100, 150, 50);
+
+  fill(0);
+  text("Enter", width / 2, height / 2 + 100);
+
+  fill(255, 0, 0);
+  text(input, width / 2, height / 2 - 50);
+
+  rectMode(CORNER);
+}
+
+let inputCooldown = 0;
+function detectInput() {
+  if (keyIsPressed && inputCooldown <= 0) {
+    if (keyCode === BACKSPACE) {
+      input = input.slice(0, -1);
+      inputCooldown = 15;
+    } else if (![87, 83, 65, 68] == keyCode) {
+      inputCooldown = 15;
+    } else if (keyCode === ENTER) {
+      if (input.toLowerCase() === "run") {
+        door4unlocked = true;
+        input = "";
+        s = false;
+        door4c = [0, 180, 0];
+      } else {
+        input = "wrong code!";
+        inputCooldown = 30;
+      }
+      inputCooldown = 30;
+    } else if (key.length === 1) {
+      input += key;
+      inputCooldown = 15;
+    }
+  }
+
+  if (inputCooldown > 0) {
+    inputCooldown--;
+  } else if (input === "wrong code!") {
+    input = "";
+  }
+}
+
+function drawDoor() {
+  for (i = 0; i < 4; i++) {
+    fill(100, 50, 50);
+    if (detectDoor(i) && (door4unlocked || i != 3)) {
+      rect(doorX[i], 80, 80, 490);
+      if (door4unlocked && i == 3) {
+        door4opened = true;
+        osc = 4;
+      }
+    } else {
+      if (door4opened) {
+        rect(doorX[3], 80, 80, 490);
+        rect(doorX[i], 80, 80, 490);
+      } else {
+        fill(100, 50, 50);
+        rect(doorX[i], 80, 290, 490);
+        
+        i == 3 ? fill(door4c[0], door4c[1], door4c[2]) : fill(255);
+        rect(doorX[i] + 110, 120, 70, 70);
+
+        textSize(30);
+        fill(0);
+        text(i + 1, doorX[i] + 145, 155);
+      }
+    }
+  }
+
+  if (!door4unlocked && detectDoor(3)) {
+    fill(0);
+    text("this door is locked!", width / 2, 30);
+  }
+
+  fill(150, 75, 75);
+  rect(280, 80, 20, 520);
+  rect(590, 80, 20, 520);
+  rect(900, 80, 20, 520);
+}
+
+function detectDoor(door) {
+  return collideRectRect(
+    birdPlayer.x,
+    birdPlayer.y,
+    birdPlayer.width,
+    birdPlayer.height,
+    doorX[door],
+    80,
+    290 - birdPlayer.width,
+    490
+  )
+}
+
+function setupLevel3() {
+  boxes = [];
+  boxes.push(new boxItem(0, height - 80, width, 80, color(100, 70, 50)));
+
+  mousePlayer.x = 100;
+  mousePlayer.y = 200;
+  birdPlayer.x = 300;
+  birdPlayer.y = 100;
+}
+
+function drawLevel3() {
+  if (counter === 100) {
+    setupLevel3();
+    resetTimer();
+    startTimer();
+  }
+
+  if (counter > 100) {
+    background(200, 220, 255);
+
+    checkForTrigger();
+
+    drawLevel3Prop();
+    morseFlasher(150, 150);
+    drawDoor(2);
+
+    for (let box of boxes) {
+      box.show();
+    }
+
+    updateBirdImg(birdPlayer, counter);
+    updateMouseDir(mousePlayer);
+
+    if (mousePlayer.y > 2000) {
+      mousePlayer.x = 100;
+      mousePlayer.y = height - 200;
+    }
+
+    mousePlayer.show();
+    mousePlayer.move(boxes);
+
+    birdPlayer.show();
+    birdPlayer.move(boxes);
+
+    if (triggerInput) {
+      detectInput();
+      enterKey();
+    }
+
+    if (collideRectRect(
+      birdPlayer.x,
+      birdPlayer.y,
+      birdPlayer.width,
+      birdPlayer.height,
+      portalX,
+      portalY,
+      29*8,
+      54*8
+    ) && collideRectRect(
+      mousePlayer.x,
+      mousePlayer.y,
+      mousePlayer.width,
+      mousePlayer.height,
+      portalX,
+      portalY,
+      29*8,
+      54*8
+    )) {
+      console.log("win");
+      //saveRun();
+    }
+
+    updateTimer();
+    drawTimer();
+  } else {
+    fill(0);
+    textSize(50);
+    text("Level 3", width / 2, height / 2);
   }
 }
 
