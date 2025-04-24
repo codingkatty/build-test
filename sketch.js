@@ -297,11 +297,7 @@ function draw() {
     textAlign(CENTER);
     text("(you died)", width / 2, height / 2);
   } else if (gameState === "victory") {
-    background(0, 0, 0);
-    fill(255);
-    textSize(30);
-    textAlign(CENTER);
-    text("you win!!!", width / 2, height / 2);
+    drawWinScene();
   }
 
   if (showModal) {
@@ -480,21 +476,21 @@ function drawStory() {
 
     background(255);
 
-    image(window[`cat_walk${cat_frame}`], anim_catX, 280, 220, 200);
-
     if (frameCounter < 1) {
       image(mouse_run1, anim_mouseX, 400, 96, 72);
-      image(bird_fly1, anim_birdX, 200, 120, 120);
-      if (frameCount % 3 === 0) {
-        cat_frame++;
-        if (cat_frame > 6) {
-          cat_frame = 1;
-        }
-      }
+      image(bird_fly1, anim_birdX, 200, 120, 120);      
     } else {
       image(mouse_run2, anim_mouseX, 400, 96, 72);
       image(bird_fly2, anim_birdX, 200, 120, 120);
     }
+
+    if (frameCount % 5 === 0) {
+      cat_frame++;
+      if (cat_frame > 6) {
+        cat_frame = 1;
+      }
+    }
+    image(window[`cat_walk${cat_frame}`], anim_catX, 280, 280, 200);
 
     fill(0);
     rect(0, 0, 1200, anim_black_h);
@@ -2017,6 +2013,7 @@ function drawLevel3() {
       54*8
     )) {
       console.log("win");
+      gameState = "victory";
       //saveRun();
     }
 
@@ -2026,6 +2023,20 @@ function drawLevel3() {
     fill(0);
     textSize(50);
     text("Level 3", width / 2, height / 2);
+  }
+}
+
+let o = 0;
+function drawWinScene() {
+  background(0, 0, 0, o);
+
+  if (o < 255) {
+    o += 5;
+    if (o > 255) o = 255;
+  } else {
+    fill(255);
+    textSize(50);
+    text("YOU WIN!", width / 2, height / 2);
   }
 }
 
