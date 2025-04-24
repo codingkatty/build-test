@@ -10,7 +10,7 @@ let pixel1,
 let mouse_run1, mouse_run2, bird_fly1, bird_fly2, cat_chaser, mouse, bird, colacan, bird_left, bird_right, board;
 let morse;
 
-let gameState = "level1";
+let gameState = "level3";
 let overButton = false;
 let showModal = false;
 
@@ -107,6 +107,9 @@ function preload() {
   piginapen = loadImage('gameassets/piginapen.jpeg');
 
   sunset = loadImage('gameassets/sunset.jpeg');
+  vase = loadImage('gameassets/vase_deco.png');
+
+  toilet = loadImage('gameassets/Toilet.png');
 }
 
 class Player {
@@ -766,6 +769,7 @@ function drawLevel1() {
   }
 
   if (counter > 100) {
+    drawLevel1Prop();
     if (doorUnlocked) {
       fill(0, 255, 0);
       textSize(30);
@@ -825,6 +829,12 @@ function drawLevel1() {
     textSize(50);
     text("Level 1", width / 2, height / 2);
   }
+}
+
+function drawLevel1Prop() {
+  image(sunset, 260, 20, 300, 300)
+
+  image(vase, 670, 205, 200, 200)
 }
 
 function drawLevel1Door() {
@@ -1798,6 +1808,7 @@ function morseFlasher(x, y) {
 }
 
 function drawLevel3Prop() {
+
   push();
   translate(500, 150);
   rotate(sin(frameCount / 60) / osc);
@@ -1816,6 +1827,10 @@ function drawLevel3Prop() {
   } else if (!dirUp && portalY < 100) {
     dirUp = true;
   }
+
+  image(toilet, -40, 230, 400, 400)
+  image(toilet, 280, 230, 400, 400)
+  image(toilet, 550, 230, 400, 400)
 }
 
 let doorX = [-10, 300, 610, 920];
