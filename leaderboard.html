@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Escape the Cat</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="assets/favicon.svg" />
+</head>
+
+<body>
+  <header class="game-header">
+    <div class="header-container">
+      <img src="assets/title.svg" alt="Escape the Cat" class="game-logo">
+      <nav class="game-nav">
+        <a href="index.html#about" class="nav-link">About</a>
+        <a href="index.html#how-to-play" class="nav-link">How to Play</a>
+        <a href="index.html#gallery" class="nav-link">Gallery</a>
+        <a href="leaderboard.html" class="nav-link">Leaderboard</a>
+        <a href="game.html" class="play-button">Play Now!</a>
+      </nav>
+    </div>
+  </header>
+  <main style="min-height: 100vh;">
+  </main>
+  <footer>
+    <p>
+      Made with <span class="heart">💙</span> by
+      <a href="https://github.com/codingkatty" target="_blank">Candy</a> and
+      <a href="https://github.com/Violetz12" target="_blank">Violetz</a> |
+      <a href="">Contact</a>
+    </p>
+  </footer>
+
+  <script>
+    fetch('http://localhost:5000/leaderboard')
+      .then(response => response.json())
+      .then(data => {
+        const leaderboardContainer = document.querySelector('main');
+        data.leaderboard.forEach(item => {
+          const leaderboardItem = document.createElement('div');
+          leaderboardItem.classList.add('leaderboard-item');
+          leaderboardItem.innerHTML = `<h2>${item.player}</h2><h3>${item.score}</h3>`;
+          leaderboardContainer.appendChild(leaderboardItem);
+        });
+      })
+      .catch(error => console.error('Error fetching leaderboard:', error));
+
+  </script>
+
+</body>
+
+</html>

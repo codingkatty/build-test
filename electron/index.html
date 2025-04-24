@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Cat Escape</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="../offline/p5.min.js"></script>
+    <script src="../offline/p5.sound.min.js"></script>
+    <link rel="icon" type="image/png" href="assets/favicon.svg" />
+    <style>
+      body {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #000000;
+        min-height: 100vh;
+        position: relative;
+      }
+      #game-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #compatibility-message {
+        display: none;
+        color: white;
+        text-align: center;
+        font-size: 1.2em;
+        padding: 20px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.8);
+      }
+      @media (max-width: 1200px), (max-height: 675px) {
+        #game-container {
+          display: none;
+        }
+        #compatibility-message {
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-container"></div>
+    <div id="compatibility-message">
+      Please try resizing or using another device.
+    </div>
+    <script src="sketch.js"></script>
+  </body>
+</html>

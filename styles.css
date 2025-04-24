@@ -27,7 +27,6 @@ body {
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .header-container {
@@ -230,7 +229,6 @@ button:hover {
     align-items: center;
     justify-content: center;
     gap: 40px;
-    background: linear-gradient(to bottom, #f5f7ff, #e6eeff);
     min-height: 600px;
     position: relative;
     text-align: center;
@@ -330,4 +328,14 @@ footer a:hover {
 
 .heart:hover {
     transform: scale(1.3) rotate(15deg);
+}
+
+.leaderboard-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #d0e3f7;
+    border-radius: 8px;
+    margin: 20px;
 }
