@@ -10,7 +10,7 @@ let pixel1,
 let mouse_run1, mouse_run2, bird_fly1, bird_fly2, cat_chaser, mouse, bird, colacan, bird_left, bird_right, board;
 let morse;
 
-let gameState = "level3";
+let gameState = "menu";
 let overButton = false;
 let showModal = false;
 
@@ -651,7 +651,7 @@ let c = 0;
 let last_key = "left"
 function updateBirdImg(birdP, frame) {
   if (frame % 10 == 0) { c == bird_left.length - 1 ? c = 0 : c++; }
-  if ((arrowkey == "bird" && keyIsDown(LEFT_ARROW)) || (wasd == "bird" && keyIsDown(65))) {
+  if ((arrowkey == "bird" && keyIsDown(LEFT_ARROW)) || (wasd == "bird" && keyIsDown(68))) {
     last_key = "left"
   }
   if ((arrowkey == "bird" && keyIsDown(RIGHT_ARROW)) || (wasd == "bird" && keyIsDown(68))) {
