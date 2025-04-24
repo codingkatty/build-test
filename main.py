@@ -2,9 +2,11 @@ import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from supabase import create_client
+from dotenv import load_dotenv
 
-supabase_url = ""
-supabase_key = ""
+load_dotenv()
+supabase_url = os.getenv("SUPABASE_URL")
+supabase_key = os.getenv("SUPABASE_KEY")
 supabase = create_client(supabase_url, supabase_key)
 
 app = Flask(__name__)
@@ -22,10 +24,15 @@ def add_leaderboard():
     }).execute()
     return jsonify({"success": True, "data": response.data}), 201
 
+#hewlpewlp
 @app.route('/leaderboard', methods=['GET'])
 def get_leaderboard():
-    response = supabase.table("leaderboard").select("player,score").order("score", desc=True).limit(10).execute()
-    return jsonify({"leaderboard": response.data}), 200
+    try:
+        response = supabase.table("leaderboard").select("player,score").order("score", desc=True).limit(10).execute()
+        return jsonify({"leaderboard": response.data}), 200
+    except Exception as e:
+        app.logger.error(f"Error fetching leaderboard: {str(e)}")
+        return jsonify({"error": "Database connection error", "details": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

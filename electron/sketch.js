@@ -10,7 +10,7 @@ let pixel1,
 let mouse_run1, mouse_run2, bird_fly1, bird_fly2, cat_chaser, mouse, bird, colacan, bird_left, bird_right, board;
 let morse;
 
-let gameState = "level1";
+let gameState = "menu";
 let overButton = false;
 let showModal = false;
 
@@ -56,33 +56,33 @@ let totalTime = [];
 let lastTimeData = 0;
 
 function preload() {
-  pixel1 = loadFont("fonts/alagard.ttf");
-  pixel2 = loadFont("fonts/minecraft_font.ttf");
+  pixel1 = loadFont("../fonts/alagard.ttf");
+  pixel2 = loadFont("../fonts/minecraft_font.ttf");
 
-  cat_frame1 = loadImage("assets/cat_walk_test1.png");
-  cat_frame2 = loadImage("assets/cat_walk_test2.png");
-  cat_base = loadImage("assets/cat_base_test.png");
+  cat_frame1 = loadImage("../assets/cat_walk_test1.png");
+  cat_frame2 = loadImage("../assets/cat_walk_test2.png");
+  cat_base = loadImage("../assets/cat_base_test.png");
 
-  cat_eyes1 = loadImage("assets/cat_eyes_test1.png");
-  cat_eyes2 = loadImage("assets/cat_eyes_test2.png");
-  cat_eyes3 = loadImage("assets/cat_eyes_test3.png");
-  cat_eyes4 = loadImage("assets/cat_eyes_test4.png");
+  cat_eyes1 = loadImage("../assets/cat_eyes_test1.png");
+  cat_eyes2 = loadImage("../assets/cat_eyes_test2.png");
+  cat_eyes3 = loadImage("../assets/cat_eyes_test3.png");
+  cat_eyes4 = loadImage("../assets/cat_eyes_test4.png");
 
-  mouse_run1 = loadImage("assets/mouse_run_anim_test1.png");
-  mouse_run2 = loadImage("assets/mouse_run_anim_test2.png");
+  mouse_run1 = loadImage("../assets/mouse_run_anim_test1.png");
+  mouse_run2 = loadImage("../assets/mouse_run_anim_test2.png");
 
-  bird_fly1 = loadImage("assets/bird_run_anim_test1.png");
-  bird_fly2 = loadImage("assets/bird_run_anim_test2.png");
+  bird_fly1 = loadImage("../assets/bird_run_anim_test1.png");
+  bird_fly2 = loadImage("../assets/bird_run_anim_test2.png");
 
-  cat_walk1 = loadImage("assets/pixil-frame-0.png");
-  cat_walk2 = loadImage("assets/pixil-frame-1.png");
-  cat_walk3 = loadImage("assets/pixil-frame-2.png");
-  cat_walk4 = loadImage("assets/pixil-frame-3.png");
-  cat_walk5 = loadImage("assets/pixil-frame-4.png");
-  cat_walk6 = loadImage("assets/pixil-frame-5.png");
-  mouse_left = loadImage("assets/mouse-vio-left.png");
-  mouse_right = loadImage("assets/mouse-vio-right.png");
-  bird = loadImage("assets/birdieeee.png");
+  cat_walk1 = loadImage("../assets/pixil-frame-0.png");
+  cat_walk2 = loadImage("../assets/pixil-frame-1.png");
+  cat_walk3 = loadImage("../assets/pixil-frame-2.png");
+  cat_walk4 = loadImage("../assets/pixil-frame-3.png");
+  cat_walk5 = loadImage("../assets/pixil-frame-4.png");
+  cat_walk6 = loadImage("../assets/pixil-frame-5.png");
+  mouse_left = loadImage("../assets/mouse-vio-left.png");
+  mouse_right = loadImage("../assets/mouse-vio-right.png");
+  bird = loadImage("../assets/birdieeee.png");
 
   bird_left = [loadImage("../gameassets/bird_left1.png"), loadImage("../gameassets/bird_left2.png"), loadImage("../gameassets/bird_left3.png")];
   bird_right = [loadImage("../gameassets/bird_right1.png"), loadImage("../gameassets/bird_right2.png"), loadImage("../gameassets/bird_right3.png")];
@@ -91,22 +91,18 @@ function preload() {
   colacan = loadImage("../gameassets/colacan-side.png");
   colacan2 = loadImage("../gameassets/colacan-flat.png");
   board = loadImage("../gameassets/board.png")
-  bgm = loadSound("assets/scary_song.mp3");
+  bgm = loadSound("../assets/scary_song.mp3");
   bgm.setVolume(0.4);
 
-  pigpen1 = loadImage('gameassets/PIGPEN1.png');
-  pigpen2 = loadImage('gameassets/PIGPEN2.png');
-  pigpen3 = loadImage('gameassets/PIGPEN3.png');
-  pigpen4 = loadImage('gameassets/PIGPEN4.png');
+  pigpen1 = loadImage('../gameassets/PIGPEN1.png');
+  pigpen2 = loadImage('../gameassets/PIGPEN2.png');
+  pigpen3 = loadImage('../gameassets/PIGPEN3.png');
+  pigpen4 = loadImage('../gameassets/PIGPEN4.png');
 
-  pigpencode = loadImage('gameassets/pigpencode.png');
+  pigpencode = loadImage('../gameassets/pigpencode.png');
 
-  morse = loadImage('assets/morse.jpg');
-  portal = loadImage('gameassets/portal.png');
-
-  piginapen = loadImage('gameassets/piginapen.jpeg');
-
-  sunset = loadImage('gameassets/sunset.jpeg');
+  morse = loadImage('../assets/morse.jpg');
+  portal = loadImage('../gameassets/portal.png');
 }
 
 class Player {
@@ -363,21 +359,6 @@ function updateTimer() {
   }
 }
 
-function saveRun(name = "bird and mouse") {
-  let data = 0;
-  let total = 0;
-
-  for (let i = 0; i < timeData.length; i++) {
-    data += timeData[i];
-    total += totalTime[i];
-  }
-
-  let xhr = new XMLHttpRequest();
-  xhr.open("POST", "https://cat-escape-leaderboard.onrender.com/new", true);
-  xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-  xhr.send(JSON.stringify({ player: name, score: Math.floor(data / total * 100) }));
-}
-
 function drawTimer(c = 0) {
   // Draw timer UI
   push();
@@ -482,7 +463,7 @@ function drawStory() {
 
     if (frameCounter < 1) {
       image(mouse_run1, anim_mouseX, 400, 96, 72);
-      image(bird_fly1, anim_birdX, 200, 120, 120);
+      image(bird_fly1, anim_birdX, 200, 120, 120);      
     } else {
       image(mouse_run2, anim_mouseX, 400, 96, 72);
       image(bird_fly2, anim_birdX, 200, 120, 120);
@@ -1507,8 +1488,6 @@ function drawLevel2Morse() {
     image(pigpen3, 800, 150, 100, 100);
     image(pigpen4, 1000, 480, 100, 100);
 
-    image(piginapen, 1100, 0, 100, 100);
-
     updateBirdImg(birdPlayer, counter);
     updateMouseDir(mousePlayer);
 
@@ -1804,11 +1783,11 @@ function drawLevel3Prop() {
   image(morse, -80, 0, 150, 180);
   pop();
 
-  image(portal, portalX, portalY, 29 * 8, 54 * 8);
+  image(portal, portalX, portalY, 29*8, 54*8);
   if (dirUp) {
-    portalY += 0.1;
+    portalY+=0.1;
   } else {
-    portalY -= 0.1;
+    portalY-=0.1;
   }
 
   if (dirUp && portalY > 120) {
@@ -1915,7 +1894,7 @@ function drawDoor() {
       } else {
         fill(100, 50, 50);
         rect(doorX[i], 80, 290, 490);
-
+        
         i == 3 ? fill(door4c[0], door4c[1], door4c[2]) : fill(255);
         rect(doorX[i] + 110, 120, 70, 70);
 
@@ -2006,8 +1985,8 @@ function drawLevel3() {
       birdPlayer.height,
       portalX,
       portalY,
-      29 * 8,
-      54 * 8
+      29*8,
+      54*8
     ) && collideRectRect(
       mousePlayer.x,
       mousePlayer.y,
@@ -2015,12 +1994,12 @@ function drawLevel3() {
       mousePlayer.height,
       portalX,
       portalY,
-      29 * 8,
-      54 * 8
+      29*8,
+      54*8
     )) {
       console.log("win");
       gameState = "victory";
-      saveRun();
+      //saveRun();
     }
 
     updateTimer();
