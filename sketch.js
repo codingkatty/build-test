@@ -10,7 +10,7 @@ let pixel1,
 let mouse_run1, mouse_run2, bird_fly1, bird_fly2, cat_chaser, mouse, bird, colacan, bird_left, bird_right, board;
 let morse;
 
-let gameState = "level3";
+let gameState = "menu";
 let overButton = false;
 let showModal = false;
 
