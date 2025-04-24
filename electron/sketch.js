@@ -359,21 +359,6 @@ function updateTimer() {
   }
 }
 
-function saveRun(name = "bird and mouse") {
-  let data = 0;
-  let total = 0;
-
-  for (let i = 0; i < timeData.length; i++) {
-    data += timeData[i];
-    total += totalTime[i];
-  }
-
-  let xhr = new XMLHttpRequest();
-  xhr.open("POST", "http://localhost:5000/new", true);
-  xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-  xhr.send(JSON.stringify({ player: name, score: Math.floor(data / total * 100) }));
-}
-
 function drawTimer(c = 0) {
   // Draw timer UI
   push();

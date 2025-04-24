@@ -369,7 +369,7 @@ function saveRun(name = "bird and mouse") {
   }
 
   let xhr = new XMLHttpRequest();
-  xhr.open("POST", "http://localhost:5000/new", true);
+  xhr.open("POST", "https://cat-escape-leaderboard.onrender.com/new", true);
   xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
   xhr.send(JSON.stringify({ player: name, score: Math.floor(data / total * 100) }));
 }
@@ -2014,7 +2014,7 @@ function drawLevel3() {
     )) {
       console.log("win");
       gameState = "victory";
-      //saveRun();
+      saveRun();
     }
 
     updateTimer();

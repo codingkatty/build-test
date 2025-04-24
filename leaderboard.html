@@ -32,7 +32,7 @@
   </footer>
 
   <script>
-    fetch('http://localhost:5000/leaderboard')
+    fetch('https://cat-escape-leaderboard.onrender.com/leaderboard')
       .then(response => response.json())
       .then(data => {
         const leaderboardContainer = document.querySelector('main');
