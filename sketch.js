@@ -10,7 +10,7 @@ let pixel1,
 let mouse_run1, mouse_run2, bird_fly1, bird_fly2, cat_chaser, mouse, bird, colacan, bird_left, bird_right, board;
 let morse;
 
-let gameState = "menu";
+let gameState = "level1";
 let overButton = false;
 let showModal = false;
 
@@ -103,6 +103,10 @@ function preload() {
 
   morse = loadImage('assets/morse.jpg');
   portal = loadImage('gameassets/portal.png');
+
+  piginapen = loadImage('gameassets/piginapen.jpeg');
+
+  sunset = loadImage('gameassets/sunset.jpeg');
 }
 
 class Player {
@@ -478,7 +482,7 @@ function drawStory() {
 
     if (frameCounter < 1) {
       image(mouse_run1, anim_mouseX, 400, 96, 72);
-      image(bird_fly1, anim_birdX, 200, 120, 120);      
+      image(bird_fly1, anim_birdX, 200, 120, 120);
     } else {
       image(mouse_run2, anim_mouseX, 400, 96, 72);
       image(bird_fly2, anim_birdX, 200, 120, 120);
@@ -1503,6 +1507,8 @@ function drawLevel2Morse() {
     image(pigpen3, 800, 150, 100, 100);
     image(pigpen4, 1000, 480, 100, 100);
 
+    image(piginapen, 1100, 0, 100, 100);
+
     updateBirdImg(birdPlayer, counter);
     updateMouseDir(mousePlayer);
 
@@ -1798,11 +1804,11 @@ function drawLevel3Prop() {
   image(morse, -80, 0, 150, 180);
   pop();
 
-  image(portal, portalX, portalY, 29*8, 54*8);
+  image(portal, portalX, portalY, 29 * 8, 54 * 8);
   if (dirUp) {
-    portalY+=0.1;
+    portalY += 0.1;
   } else {
-    portalY-=0.1;
+    portalY -= 0.1;
   }
 
   if (dirUp && portalY > 120) {
@@ -1909,7 +1915,7 @@ function drawDoor() {
       } else {
         fill(100, 50, 50);
         rect(doorX[i], 80, 290, 490);
-        
+
         i == 3 ? fill(door4c[0], door4c[1], door4c[2]) : fill(255);
         rect(doorX[i] + 110, 120, 70, 70);
 
@@ -2000,8 +2006,8 @@ function drawLevel3() {
       birdPlayer.height,
       portalX,
       portalY,
-      29*8,
-      54*8
+      29 * 8,
+      54 * 8
     ) && collideRectRect(
       mousePlayer.x,
       mousePlayer.y,
@@ -2009,8 +2015,8 @@ function drawLevel3() {
       mousePlayer.height,
       portalX,
       portalY,
-      29*8,
-      54*8
+      29 * 8,
+      54 * 8
     )) {
       console.log("win");
       gameState = "victory";
