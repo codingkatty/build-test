@@ -38,9 +38,6 @@
     "publish": {
       "provider": "github",
       "releaseType": "release"
-    },
-    "electronBuilder": {
-      "publish": "always"
     }
   },
   "keywords": [],
