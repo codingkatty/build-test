@@ -167,7 +167,7 @@ main #intro {
     border-radius: 20px;
 }
 
-button {
+.show {
     color: #ffffff;
     background-color: rgb(21, 62, 100);
     padding: 15px 40px 15px 40px;
@@ -180,12 +180,12 @@ button {
     cursor: pointer;
 }
 
-button:active {
+.show:active {
     transform: translateY(5px);
     box-shadow: 0px 5px black, 0px -5px black, 5px 0px black, -5px 0px black, inset 0px 5px #00000038;
 }
 
-button:hover {
+.show:hover {
     background-color: rgb(25, 99, 168);
 }
 
@@ -288,6 +288,28 @@ button:hover {
     height: auto;
     border-radius: 12px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.download-btn {
+    color: #ffffff;
+    background-color: rgb(155, 3, 3);
+    padding: 20px 45px 20px 45px;
+    margin-left: 3px;
+    margin-top: 0px;
+    font-size: 35px;
+    font-family: "Alagard", system-ui;
+    border: 0;
+    box-shadow: 0px 5px black, 0px -5px black, 5px 0px black, -5px 0px black, 0px 10px #00000038, 5px 5px #00000038, -5px 5px #00000038, inset 0px 5px #ffffff36;
+    cursor: pointer;
+}
+
+.download-btn:active {
+    transform: translateY(5px);
+    box-shadow: 0px 5px black, 0px -5px black, 5px 0px black, -5px 0px black, inset 0px 5px #00000038;
+}
+
+.download-btn:hover {
+    background-color: rgb(155, 3, 3);
 }
 
 footer {
