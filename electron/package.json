@@ -7,9 +7,7 @@
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "electron-builder",
-    "build:win": "electron-builder --win",
-    "build:mac": "electron-builder --mac",
-    "build:linux": "electron-builder --linux"
+    "build:win": "electron-builder --win --x64"
   },
   "build": {
     "appId": "com.violetzcandy.escape",
