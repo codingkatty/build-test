@@ -1,9 +1,9 @@
 {
   "name": "cat-escape",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A co-op game where you escape the cat",
   "main": "main.js",
-  "respository": {
+  "repository": {
     "type": "git",
     "url": "https://github.com/Violetz12/JAVASCRIPT-GAME.git"
   },
