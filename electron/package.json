@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "A co-op game where you escape the cat",
   "main": "main.js",
+  "respository": {
+    "type": "git",
+    "url": "https://github.com/Violetz12/JAVASCRIPT-GAME.git"
+  },
   "scripts": {
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1",
