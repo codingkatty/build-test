@@ -84,13 +84,13 @@ function preload() {
   mouse_right = loadImage("assets/mouse-vio-right.png");
   bird = loadImage("assets/birdieeee.png");
 
-  bird_left = [loadImage("../gameassets/bird_left1.png"), loadImage("../gameassets/bird_left2.png"), loadImage("../gameassets/bird_left3.png")];
-  bird_right = [loadImage("../gameassets/bird_right1.png"), loadImage("../gameassets/bird_right2.png"), loadImage("../gameassets/bird_right3.png")];
+  bird_left = [loadImage("gameassets/bird_left1.png"), loadImage("../gameassets/bird_left2.png"), loadImage("../gameassets/bird_left3.png")];
+  bird_right = [loadImage("gameassets/bird_right1.png"), loadImage("../gameassets/bird_right2.png"), loadImage("../gameassets/bird_right3.png")];
 
-  oof = loadSound("../assets/oof.mp3");
-  colacan = loadImage("../gameassets/colacan-side.png");
-  colacan2 = loadImage("../gameassets/colacan-flat.png");
-  board = loadImage("../gameassets/board.png")
+  oof = loadSound("assets/oof.mp3");
+  colacan = loadImage("gameassets/colacan-side.png");
+  colacan2 = loadImage("gameassets/colacan-flat.png");
+  board = loadImage("gameassets/board.png")
   bgm = loadSound("assets/scary_song.mp3");
   bgm.setVolume(0.4);
 
@@ -99,7 +99,7 @@ function preload() {
   pigpen3 = loadImage('gameassets/PIGPEN3.png');
   pigpen4 = loadImage('gameassets/PIGPEN4.png');
 
-  pigpencode = loadImage('gameassets/pigpencode.png');
+  pigpencode = loadImage('gameassets/Pigpencode.png');
 
   morse = loadImage('assets/morse.jpg');
   portal = loadImage('gameassets/portal.png');
