@@ -1,6 +1,6 @@
 {
   "name": "cat-escape",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A co-op game where you escape the cat",
   "main": "main.js",
   "repository": {
@@ -34,7 +34,14 @@
           "offline/**/*"
         ]
       }
-    ]
+    ],
+    "publish": {
+      "provider": "github",
+      "releaseType": "release"
+    },
+    "electronBuilder": {
+      "publish": "always"
+    }
   },
   "keywords": [],
   "author": "Vio Studios",
