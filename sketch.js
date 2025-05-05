@@ -99,7 +99,7 @@ function preload() {
   pigpen3 = loadImage('gameassets/PIGPEN3.png');
   pigpen4 = loadImage('gameassets/PIGPEN4.png');
 
-  pigpencode = loadImage('gameassets/pigpencode.png');
+  pigpencode = loadImage('gameassets/Pigpencode.png');
 
   morse = loadImage('assets/morse.jpg');
   portal = loadImage('gameassets/portal.png');
