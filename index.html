@@ -39,7 +39,7 @@
             resizing your browser window.
           </p>
 
-          <button onclick="
+          <button class="show" onclick="
             fetch('/game')
               .then(response => {
                 if (response.ok) {
@@ -102,6 +102,11 @@
           <source src="assets/Tut.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
+
+        <h2 style="margin-top: 80px;">Download our game!</h2>
+        <button class="download-btn">
+          Download
+        </button>
       </div>
     </section>
 
