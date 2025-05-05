@@ -37,7 +37,14 @@
     ],
     "publish": {
       "provider": "github",
-      "releaseType": "release"
+      "releaseType": "release",
+      "repo": "JAVASCRIPT-GAME",
+      "owner": "Violetz12"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "../assets/icon.ico",
+      "artifact-name": "${productName}-${version}-${os}-${arch}.${ext}"
     }
   },
   "keywords": [],
