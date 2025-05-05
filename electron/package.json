@@ -1,16 +1,44 @@
 {
-  "name": "electron",
+  "name": "cat-escape",
   "version": "1.0.0",
+  "description": "A co-op game where you escape the cat",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.violetzcandy.escape",
+    "productName": "Cat Escape",
+    "files": [
+      "**/*",
+      "../offline/**/*",
+      "../assets/**/*",
+      "../gameassets/**/*",
+      "../fonts/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../",
+        "to": "app",
+        "filter": [
+          "assets/**/*",
+          "gameassets/**/*",
+          "fonts/**/*",
+          "offline/**/*"
+        ]
+      }
+    ]
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "author": "Vio Studios",
+  "license": "MIT",
   "devDependencies": {
-    "electron": "^35.2.1"
+    "electron": "^35.2.1",
+    "electron-builder": "^26.0.12"
   }
 }

@@ -376,7 +376,7 @@ function saveRun(name = "bird and mouse") {
   }
 
   let xhr = new XMLHttpRequest();
-  xhr.open("POST", "https://cat-escape-leaderboard.onrender.com/new", true);
+  xhr.open("POST", "http://37.27.51.34:38023/new", true);
   xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
   xhr.send(JSON.stringify({ player: name, score: Math.floor(data / total * 100) }));
 }
