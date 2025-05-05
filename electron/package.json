@@ -43,8 +43,7 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "../assets/icon.ico",
-      "artifact-name": "${productName}-${version}-${os}-${arch}.${ext}"
+      "icon": "../assets/icon.ico"
     }
   },
   "keywords": [],
