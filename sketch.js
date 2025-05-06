@@ -376,7 +376,7 @@ function saveRun(name = "bird and mouse") {
   }
 
   let xhr = new XMLHttpRequest();
-  xhr.open("POST", "http://37.27.51.34:38023/new", true);
+  xhr.open("POST", "https://leaderboard.violetzcandy.com/new", true);
   xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
   xhr.send(JSON.stringify({ player: name, score: Math.floor(data / total * 100) }));
 }
@@ -1522,7 +1522,7 @@ function drawLevel2Morse() {
     updateBirdImg(birdPlayer, counter);
     updateMouseDir(mousePlayer);
 
-    if (mousePlayer > 2000) {
+    if (mousePlayer.y > 2000) {
       mousePlayer.x = 100;
       mousePlayer.y = height - 210;
     }
@@ -1844,6 +1844,12 @@ let door4c = [255, 0, 0];
 let portalX = 970;
 let portalY = 110;
 
+let solvedMorse = false;
+
+let playerName = "";
+let showNameInput = false;
+let nameSubmitted = false;
+
 function checkForTrigger() {
   if (collideRectRect(
     birdPlayer.x,
@@ -1896,6 +1902,7 @@ function detectInput() {
         input = "";
         s = false;
         door4c = [0, 180, 0];
+        solvedMorse = true;
       } else {
         input = "wrong code!";
         inputCooldown = 30;
@@ -2032,10 +2039,9 @@ function drawLevel3() {
       portalY,
       29 * 8,
       54 * 8
-    )) {
+    ) && solvedMorse) {
       console.log("win");
       gameState = "victory";
-      saveRun();
     }
 
     updateTimer();
@@ -2049,6 +2055,8 @@ function drawLevel3() {
 
 let o = 0;
 function drawWinScene() {
+  inputCooldown = 0;
+  triggerInput = false;
   background(0, 0, 0, o);
 
   if (o < 255) {
@@ -2058,6 +2066,26 @@ function drawWinScene() {
     fill(255);
     textSize(50);
     text("YOU WIN!", width / 2, height / 2);
+
+    if (!nameSubmitted) {
+      showNameInput = true;
+      fill(50, 0, 0);
+      rect(width/2 - 150, height/2 + 60, 300, 40);
+      fill(255);
+      rect(width/2 - 145, height/2 + 65, 290, 30);
+
+      fill(255);
+      textSize(20);
+      text("Name:", width/2, height/2 + 50);
+
+      fill(0);
+      textSize(18);
+      text(playerName, width/2, height/2 + 80);
+
+      textSize(14);
+      fill(255);
+      text("Enter", width/2, height/2 + 120);
+    }
   }
 }
 
@@ -2102,5 +2130,25 @@ function resolveCollision(player, obj) {
     } else if (fromRight) {
       player.x = obj.x + obj.width;
     }
+  }
+}
+
+function keyPressed() {
+  if (showNameInput && !nameSubmitted) {
+    if (keyCode === ENTER && playerName.length > 0) {
+      saveRun(playerName);
+      nameSubmitted = true;
+
+      setTimeout(function() {
+        window.location.reload();
+      }, 1500);
+    } else if (keyCode === BACKSPACE) {
+      playerName = playerName.slice(0, -1);
+      return false;
+    } else if (key.length === 1 && /^[a-zA-Z0-9]$/.test(key) && playerName.length < 15) {
+      playerName += key;
+      return false;
+    }
+    return false;
   }
 }
