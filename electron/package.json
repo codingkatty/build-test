@@ -1,6 +1,6 @@
 {
   "name": "cat-escape",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "A co-op game where you escape the cat",
   "main": "main.js",
   "repository": {
