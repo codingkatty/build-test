@@ -361,3 +361,7 @@ footer a:hover {
     border-radius: 8px;
     margin: 20px;
 }
+
+.leaderboard-item h2 {
+    font-size: 1.6rem;
+}
