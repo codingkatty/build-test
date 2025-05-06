@@ -1,11 +1,11 @@
 {
   "name": "cat-escape",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A co-op game where you escape the cat",
   "main": "main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Violetz12/JAVASCRIPT-GAME.git"
+    "url": "https://github.com/codingkatty/build-test.git"
   },
   "scripts": {
     "start": "electron .",
@@ -38,8 +38,8 @@
     "publish": {
       "provider": "github",
       "releaseType": "release",
-      "repo": "JAVASCRIPT-GAME",
-      "owner": "Violetz12"
+      "repo": "build-test",
+      "owner": "codingkatty"
     },
     "win": {
       "target": "nsis",
