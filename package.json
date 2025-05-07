@@ -18,10 +18,10 @@
     "productName": "Cat Escape",
     "files": [
       "**/*",
-      "../offline/**/*",
-      "../assets/**/*",
-      "../gameassets/**/*",
-      "../fonts/**/*"
+      "offline/**/*",
+      "assets/**/*",
+      "gameassets/**/*",
+      "fonts/**/*"
     ],
     "extraResources": [
       {
@@ -43,7 +43,7 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "../assets/favicon.ico"
+      "icon": "assets/favicon.ico"
     }
   },
   "keywords": [],
