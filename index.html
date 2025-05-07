@@ -1,125 +1,54 @@
 <!DOCTYPE html>
-<html>
-
-<head>
-  <title>Escape the Cat</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="icon" href="assets/favicon.svg" />
-</head>
-
-<body>
-  <header class="game-header">
-    <div class="header-container">
-      <img src="assets/title.svg" alt="Escape the Cat" class="game-logo">
-      <nav class="game-nav">
-        <a href="#about" class="nav-link">About</a>
-        <a href="#how-to-play" class="nav-link">How to Play</a>
-        <a href="#gallery" class="nav-link">Gallery</a>
-        <a href="leaderboard.html" class="nav-link">Leaderboard</a>
-        <a href="game.html" class="play-button">Play Now!</a>
-      </nav>
+<html lang="en">
+  <head>
+    <title>Cat Escape</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="offline/p5.min.js"></script>
+    <script src="offline/p5.sound.min.js"></script>
+    <link rel="icon" type="image/png" href="assets/favicon.svg" />
+    <style>
+      body {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #000000;
+        min-height: 100vh;
+        position: relative;
+      }
+      #game-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #compatibility-message {
+        display: none;
+        color: white;
+        text-align: center;
+        font-size: 1.2em;
+        padding: 20px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.8);
+      }
+      @media (max-width: 1200px), (max-height: 675px) {
+        #game-container {
+          display: none;
+        }
+        #compatibility-message {
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-container"></div>
+    <div id="compatibility-message">
+      Please try resizing or using another device.
     </div>
-  </header>
-  <main>
-    <section id="about">
-      <div id="intro-c">
-        <div>
-          <h1>Escape the cat!</h1>
-          <p>
-            Welcome to our interactive experience built with the magic of <strong>P5.JS</strong>! This is no ordinary
-            game — it’s an <em>escape room challenge</em> where you and a friend must work together to outsmart a giant
-            cat.
-          </p>
-          <p>
-            One of you plays a small mouse, the other a flying bird. Solve puzzles, activate buttons, and help each
-            other escape before the cat catches you (jumpscare alert!). 🐭🐦🐱
-          </p>
-          <p>
-            <strong>Note:</strong> Best played on desktop or laptop devices. If the game doesn’t load properly, try
-            resizing your browser window.
-          </p>
-
-          <button class="show" onclick="
-            fetch('/game')
-              .then(response => {
-                if (response.ok) {
-                  window.location.href = '/game';
-                } else {
-                  window.location.href = 'game.html';
-                }
-              })
-              .catch(() => {
-                window.location.href = 'game.html';
-              })
-          ">
-            Play the game!!
-          </button>
-        </div>
-
-        <img src="assets/cat-thumbnail-ph.png" style="margin-left: 20px;" />
-      </div>
-    </section>
-
-
-    <section id="how-to-play">
-      <h2>How to Play</h2>
-      <p>
-        This is a <strong>2-player escape game</strong> — you’ll need teamwork and quick thinking to beat
-        the clock!
-      </p>
-
-      <ul class="how-list">
-        <li><strong>Player 1:</strong> Use <b>Arrow Keys</b></li>
-        <li><strong>Player 2:</strong> Use <b>W</b> <b>A</b> <b>S</b> <b>D</b></li>
-        <li>Each character has <strong>unique abilities</strong>:
-          <ul>
-            <li>One can <em>fly</em> 🕊️</li>
-            <li>One can <em>slip through tight spaces</em> 🐭</li>
-          </ul>
-        </li>
-        <li>Work together to <strong>solve puzzles</strong> and find the way out!</li>
-        <li>Oh, and remember to <strong>finish before the time end</strong>... or... you’ll see 😼</li>
-      </ul>
-    </section>
-
-
-    <section id="gallery">
-      <div class="gallery">
-        <h2>Gallery</h2>
-        <div class="gallery-images">
-          <img src="assets/img 1.png" alt="Image 1" />
-          <img src="assets/img 2.png" alt="Image 2" />
-          <img src="assets/img 3.png" alt="Image 3" />
-        </div>
-      </div>
-    </section>
-
-
-    <section id="Tutorial">
-      <div class="tutorial-container">
-        <h2>Video Tutorial</h2>
-        <video controls id="video">
-          <source src="assets/Tut.mp4" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-
-        <h2 style="margin-top: 80px;">Download our game!</h2>
-        <button class="download-btn">
-          Download
-        </button>
-      </div>
-    </section>
-
-  </main>
-  <footer>
-    <p>
-      Made with <span class="heart">💙</span> by
-      <a href="https://github.com/codingkatty" target="_blank">Candy</a> and
-      <a href="https://github.com/Violetz12" target="_blank">Violetz</a> |
-      <a href="">Contact</a>
-    </p>
-  </footer>
-
-</body>
-
+    <script src="sketch.js"></script>
+  </body>
 </html>

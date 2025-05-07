@@ -4,7 +4,7 @@ const createWindow = () => {
   const win = new BrowserWindow({
     width: 1250,
     height: 725,
-    icon: "../assets/favicon.ico"
+    icon: "assets/favicon.ico"
   })
 
   win.setMenuBarVisibility(false)
