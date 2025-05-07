@@ -84,8 +84,8 @@ function preload() {
   mouse_right = loadImage("assets/mouse-vio-right.png");
   bird = loadImage("assets/birdieeee.png");
 
-  bird_left = [loadImage("gameassets/bird_left1.png"), loadImage("../gameassets/bird_left2.png"), loadImage("../gameassets/bird_left3.png")];
-  bird_right = [loadImage("gameassets/bird_right1.png"), loadImage("../gameassets/bird_right2.png"), loadImage("../gameassets/bird_right3.png")];
+  bird_left = [loadImage("gameassets/bird_left1.png"), loadImage("gameassets/bird_left2.png"), loadImage("gameassets/bird_left3.png")];
+  bird_right = [loadImage("gameassets/bird_right1.png"), loadImage("gameassets/bird_right2.png"), loadImage("gameassets/bird_right3.png")];
 
   oof = loadSound("assets/oof.mp3");
   colacan = loadImage("gameassets/colacan-side.png");
