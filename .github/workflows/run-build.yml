@@ -1,7 +1,0 @@
-name: Trigger Build
-
-on: workflow_dispatch
-
-jobs:
-  build:
-    uses: codingkatty/build-test/.github/workflows/build.yml@9564f33
