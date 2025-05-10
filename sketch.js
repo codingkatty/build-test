@@ -654,7 +654,7 @@ let c = 0;
 let last_key = "left"
 function updateBirdImg(birdP, frame) {
   if (frame % 10 == 0) { c == bird_left.length - 1 ? c = 0 : c++; }
-  if ((arrowkey == "bird" && keyIsDown(LEFT_ARROW)) || (wasd == "bird" && keyIsDown(68))) {
+  if ((arrowkey == "bird" && keyIsDown(LEFT_ARROW)) || (wasd == "bird" && keyIsDown(65))) {
     last_key = "left"
   }
   if ((arrowkey == "bird" && keyIsDown(RIGHT_ARROW)) || (wasd == "bird" && keyIsDown(68))) {
@@ -2084,7 +2084,7 @@ function drawWinScene() {
 
       textSize(14);
       fill(255);
-      text("Enter", width/2, height/2 + 120);
+      text("(Enter) to Submit", width/2, height/2 + 120);
     }
   }
 }
@@ -2140,7 +2140,7 @@ function keyPressed() {
       nameSubmitted = true;
 
       setTimeout(function() {
-        window.location.reload();
+        window.location.href = "leaderboard.html";
       }, 1500);
     } else if (keyCode === BACKSPACE) {
       playerName = playerName.slice(0, -1);

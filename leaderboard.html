@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cat Escape</title>
+    <link rel="icon" href="assets/favicon.svg" />
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+        }
+
+        @font-face {
+            font-family: 'Alagard';
+            src: url('fonts/alagard.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Minecraft';
+            src: url('fonts/minecraft_font.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'Minecraft', sans-serif;
+        }
+
+        header {
+            padding: 20px;
+            background-color: #153e64;
+        }
+
+        a {
+            color: #ecf0f1;
+            text-decoration: none;
+            font-family: 'Alagard', sans-serif;
+            font-size: 1.4rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            position: relative;
+            transition: all 0.3s ease;
+            padding-bottom: 2px;
+        }
+
+        a:hover {
+            transform: translateY(-3px);
+        }
+
+        a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: #ffffff;
+            transition: width 0.3s ease;
+        }
+
+        a:hover::after {
+            width: 100%;
+        }
+
+        h1 {
+            font-family: 'Alagard', serif;
+            font-size: 2.5em;
+            margin-top: 10px;
+            color: #d0e3f7;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #d0e3f7;
+            border-radius: 8px;
+            margin: 20px;
+        }
+
+        .leaderboard-item h2 {
+            font-size: 1.6rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html">back</a>
+        <h1>Leaderboard</h1>
+    </header>
+    <main style="min-height: 100vh;"></main>
+
+    <script>
+        fetch('https://leaderboard.violetzcandy.com/leaderboard')
+            .then(response => response.json())
+            .then(data => {
+                const leaderboardContainer = document.querySelector('main');
+                data.leaderboard.forEach(item => {
+                    const leaderboardItem = document.createElement('div');
+                    leaderboardItem.classList.add('leaderboard-item');
+                    leaderboardItem.innerHTML = `<h2>${item.player}</h2><h3>${item.score}</h3>`;
+                    leaderboardContainer.appendChild(leaderboardItem);
+                });
+            })
+            .catch(error => console.error('Error fetching leaderboard:', error));
+
+    </script>
+</body>
+</html>

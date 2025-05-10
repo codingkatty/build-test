@@ -1,6 +1,6 @@
 {
   "name": "cat-escape",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A co-op game where you escape the cat",
   "main": "main.js",
   "repository": {
@@ -11,10 +11,12 @@
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "electron-builder",
-    "build:win": "electron-builder --win --x64"
+    "build:win": "electron-builder --win --x64",
+    "build:linux": "electron-builder --linux"
   },
   "build": {
     "appId": "com.violetzcandy.escape",
+    "asar": true,
     "productName": "Cat Escape",
     "files": [
       "**/*",
@@ -43,7 +45,12 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "assets/favicon.ico"
+      "icon": "assets/icon-win.ico"
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Game",
+      "icon": "assets/icon-linux.png"
     }
   },
   "keywords": [],
