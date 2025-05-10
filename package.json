@@ -54,8 +54,7 @@
     }
   },
   "keywords": [],
-  "author": "Vio Studios",
-  "email": "m001720@permatapintar.ukm.edu.my",
+  "author": "Vio Studios <m001720@permatapintar.ukm.edu.my>",
   "license": "MIT",
   "devDependencies": {
     "electron": "^35.2.1",
